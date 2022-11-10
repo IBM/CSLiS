@@ -1,0 +1,36 @@
+#!/bin/sh
+
+getarg1()
+{
+    echo $1
+}
+
+getstrmmods()
+{
+    /sbin/lsmod | grep "^streams[-_]" | \
+    while read line; do
+        echo -n "`getarg1 $line` "
+    done
+}
+
+if [[ "x$(uname -r)" < "x3.0." ]]; then
+  echo "This release is less then Linux 3.0 : $TESTREL , streams will be stopped"
+else
+  echo "Test release is equal or greater to Linux 3.0: $TESTREL , reboot is required"
+  exit $?
+fi
+
+if /sbin/lsmod | grep -q "^streams"; then
+    # Detach from all files
+    /usr/sbin/fdetach -a
+fi
+
+strmmods=`getstrmmods`
+if [ "$strmmods..." != "..." ]; then
+    if ! modprobe -r $strmmods 2>/dev/null; then
+	echo "Could not unload module(s): ${strmmods}."
+    fi
+fi
+
+modprobe -r streams 2>/dev/null
+exit $?
