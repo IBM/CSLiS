@@ -81,7 +81,9 @@
 #include <linux/bios32.h>		/* old style PCI routines */
 #include <linux/mm.h>			/* vremap */
 #endif
-#include <stdarg.h>
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305)  //For RHEL 9 update 12-2022
+#include <stdarg.h>                    /* for va_list */
+#endif
 
 #define	INCL_FROM_OSIF_DRIVER		/* do not change routine names */
 #include <sys/osif.h>

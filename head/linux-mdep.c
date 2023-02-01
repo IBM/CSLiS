@@ -83,7 +83,11 @@
  /* In RHEL 8.5, 4.18.0-348 kernel moved definition for __invalidate_device()  */
 #if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2053)  || \
      (LINUX_VERSION_CODE > KERNEL_VERSION(4,18,0)))
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305)  //For RHEL 9 update 12-2022
+#include <linux/blkdev.h>
+#else
 #include <linux/genhd.h>
+#endif
 #include <linux/blk_types.h>
 #else
 #include <linux/fs.h>		/* linux file sys externs */

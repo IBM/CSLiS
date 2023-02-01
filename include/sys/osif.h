@@ -29,7 +29,9 @@
 #else
 #include <generated/autoconf.h>
 #endif
-#include <stdarg.h>			/* for va_list */
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305)  //For RHEL 9 update 12-2022
+#include <stdarg.h>                    /* for va_list */
+#endif
 #include <linux/wait.h>			/* for struct wait_queue */
 #include <linux/timer.h>                /* for struct timer_list */
 #include <linux/time.h>

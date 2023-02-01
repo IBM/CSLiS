@@ -34,8 +34,9 @@
 #include <sys/stream.h>
 #include <sys/poll.h>
 #include <sys/lislocks.h>
-
-#include <stdarg.h>
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305)  //For RHEL 9 update 12-2022
+#include <stdarg.h>                    /* for va_list */
+#endif
 #include <sys/osif.h>
 #if defined(LINUX)			/* Linux kernel version */
 #include <sys/lismem.h>
