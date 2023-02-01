@@ -7,7 +7,7 @@
 #
 ls -l /lib/modules/`uname -r`/misc | grep streams.ko >/dev/null 2>&1
 if [ $? = 0 ]
-then 
+then
   echo " LiS is up to date"
 else
   echo " LiS needs to be built"
