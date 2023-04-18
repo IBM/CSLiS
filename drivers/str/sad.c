@@ -34,7 +34,6 @@
 #include <sys/sad.h>
 
 #include <sys/LiS/config.h>
-#include <sys/osif.h>
 
 /*
  *  Some configuration sanity checks

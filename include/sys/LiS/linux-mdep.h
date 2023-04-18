@@ -162,7 +162,9 @@
 #include <linux/sched.h>	/* sleep,wake,... */
 #include <linux/wait.h>
 #include <linux/kernel.h>	/* suser,...*/
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0))
 #include <linux/interrupt.h>
+#endif
 #include <linux/major.h>
 #include <linux/fs.h>		/* inodes,... */
 #include <linux/fcntl.h>	/* inodes,... */
