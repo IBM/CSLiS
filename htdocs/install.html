@@ -1,0 +1,485 @@
+<html>
+
+
+
+<head>
+
+<title>Installing CSLiS</title>
+<meta name="title" content="Installing CSLiS">
+<meta name="keywords" content="Linux, streams, install, installing, CSLiS">
+<meta name="description" content="How to install CSLiS">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<style type="text/css">
+
+<!--
+
+h2 {  font-family: Arial, Helvetica, sans-serif}
+
+h1 {  font-family: Arial, Helvetica, sans-serif}
+
+h3 {  font-family: Arial, Helvetica, sans-serif}
+
+p {  font-family: Arial, Helvetica, sans-serif; font-size: 12pt}
+
+a {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:link {  font-family: Arial, Helvetica, sans-serif; color: #0000FF}
+
+a:hover {  font-family: Arial, Helvetica, sans-serif; color: #FF3333}
+
+li {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+ol {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+
+-->
+
+</style>
+
+<script language="JavaScript">
+
+<!--
+
+function MM_swapImgRestore() { //v3.0
+
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+
+}
+
+
+
+function MM_preloadImages() { //v3.0
+
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+
+}
+
+
+
+function MM_findObj(n, d) { //v3.0
+
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+
+}
+
+
+
+function MM_swapImage() { //v3.0
+
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+
+}
+
+//-->
+
+</script>
+
+</head>
+
+
+
+
+
+
+
+<body bgcolor="#FFFFFF" onLoad="MM_preloadImages('i/kernel_on.gif','i/download_on.gif','i/install_on.gif','i/removal_on.gif','i/loading_on.gif','i/drivers_on.gif','i/config_on.gif','i/demand_on.gif','i/compiled_on.gif','i/apps_on.gif','i/otherres_on.gif','i/command_on.gif','i/dki_on.gif','i/libs_on.gif','i/lisdrvrs_on.gif')">
+<table width="700" border="0" cellspacing="0" cellpadding="0" height="120" bgcolor="#6666CC">
+
+	 <tr> 
+
+		  <td width="120" height="120" rowspan="3"><a href="index.html"><img src="i/penguin.gif" width="120" height="120" border="0"></a></td>
+
+		  <td rowspan="3" width="570" height="120" align="center" valign="middle"> 
+
+			   <h1><font color="#FFFFFF" style="font-size:30pt;">Communications Server Linux STREAMS (CSLiS)</font></h1>
+
+			 </td>
+
+		  <td bgcolor="#ffffff" rowspan="3" width="10" height="120"><img src="./i/sideborder.gif" width="10" height="130"></td>
+
+	 </tr>
+
+	 <tr> </tr>
+
+	 <tr> </tr>
+
+</table>
+
+<img src="./i/bottomborder.gif" width="703" height="15"> <br>
+
+<table width="700" border="0" cellspacing="0" cellpadding="0">
+
+  <tr> 
+
+    <td rowspan="2" width="101" align="left" valign="top"> 
+      <table width="90" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td><a href="kernel.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('kernel','','i/kernel_on.gif',1)"><img name="kernel" border="0" src="i/kernel_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="download.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('download','','i/download_on.gif',1)"><img name="download" border="0" src="i/download_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="install.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('install','','i/install_on.gif',1)"><img name="install" border="0" src="i/install_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="removal.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('removal','','i/removal_on.gif',1)"><img name="removal" border="0" src="i/removal_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="loading.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('loading','','i/loading_on.gif',1)"><img name="loading" border="0" src="i/loading_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drivers.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('drivers','','i/drivers_on.gif',1)"><img name="drivers" border="0" src="i/drivers_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="config.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('config','','i/config_on.gif',1)"><img name="config" border="0" src="i/config_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="demand.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('demand','','i/demand_on.gif',1)"><img name="demand" border="0" src="i/demand_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="compiled.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('compiled','','i/compiled_on.gif',1)"><img name="compiled" border="0" src="i/compiled_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="apps.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('apps','','i/apps_on.gif',1)"><img name="apps" border="0" src="i/apps_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="otherres.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('otherres','','i/otherres_on.gif',1)"><img name="otherres" border="0" src="i/otherres_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="cmds.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('cmds','','i/command_on.gif',1)"><img name="cmds" border="0" src="i/command_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="dki.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('dki','','i/dki_on.gif',1)"><img name="dki" border="0" src="i/dki_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="libc.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('libs','','i/libs_on.gif',1)"><img name="libs" border="0" src="i/libs_off.gif" width="81" height="35"></a></td>
+        </tr>
+        <tr> 
+          <td><a href="drvrs.html" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('lisdrvrs','','i/lisdrvrs_on.gif',1)"><img name="lisdrvrs" border="0" src="i/lisdrvrs_off.gif" width="81" height="35"></a></td>
+        </tr>
+      </table>
+    </td>
+
+    <td width="599" height="75"> 
+      <div align="center"> 
+
+        <h2>Installation of CSLiS </h2>
+
+      </div>
+
+    </td>
+
+  </tr>
+
+  <tr> 
+    <td width="599" height="100%" align="left" valign="top"> 
+      <p>Installation of CSLiS is performed using a build script that determines the current 
+        kernel level and then builds the User space and kernel module. The &quot;buildLiS&quot; 
+        script will make the libraries, kernel module and driver definitions needed to 
+        install the Communications Server Linux Streams driver.   
+      </p>
+      <p>For the installation to proceed to its conclusion you must be logged 
+        in as &quot;root&quot;. </p>
+      <p>The easiest way to install CSLiS is to proceed as follows. </p>
+      <blockquote> 
+        <p><font size="2" face="Courier New">cd /usr/src/CSLiS-7xx</font> <font size="2">(where 
+          &quot;xx&quot; is the version number)</font><br>
+          <font size="2" face="Courier New">./buildLiS</font></p>
+      </blockquote>
+      <p>The version number in the above example is used for illustrative purposes 
+        only. Use the version number of the package that you downloaded. </p>
+      <p>The buildLiS script will automatically run the CSLiS <font face="Courier New, Courier, mono">Configure</font> 
+        script. This will determine the default kernel level to use, the paths for the source required, 
+        specific parameters needed based off architecture used.</p>
+      <p>The configuration script will make a symbolic link from <font face="Courier New, Courier, mono">/usr/src/LiS</font> 
+        to whatever directory the <font face="Courier New, Courier, mono">Configure</font> 
+        script was run from. This makes it easy to refer to the directory containing 
+        the latest installed version of CSLiS. This symbolic link will only be made 
+        if the <font face="Courier New, Courier, mono">Configure</font> script 
+        (or initial &quot;make&quot;) is run under &quot;root&quot;. </p>
+      <p>If you want to uninstall CSLiS, enter <font face="Courier New, Courier, mono">make uninstall</font>. When it completes you can then 
+        do <font face="Courier New, Courier, mono">make very-clean</font>. To remove the directory, enter 
+        <font face="Courier New, Courier, mono">rm -fr /usr/src/CSLiS-7xx/ </font> (the &quot;xx&quot; depends on whatever version 
+        of CSLiS you are removing). For more information about uninstalling CSLiS, 
+        click <a href="removal.html">here</a>. </p>
+      <h2><font size="4">Configuration</font> </h2>
+      <p>The buildLiS script invokes the Configure script to use the currently loaded kernel level for installing the 
+        kernel module. The configuration can be called to build other levels of the kernel, but for CSLiS, the default 
+        kernel that is loaded is assumed to the be level the CSLiS module driver will run with.  
+        The configuration script will look to place the &quot;streams.ko&quot; into the  
+        module directory <font face="Courier New, Courier, mono">/lib/modules/<i>kernel-version</i>/misc</font> 
+        and your kernel source resides in the directory <font face="Courier New, Courier, mono">/usr/src/linux</font>.</p>
+      <h2><font size="4">Re-Configuration</font> </h2>
+      <p>You can re-configure CSLiS by running the <font face="Courier New, Courier, mono">Configure</font> 
+        script again at any time. The defaults for a re-configuration are the 
+        settings arrived at by the most recent previous run of <font face="Courier New, Courier, mono">Configure</font>. 
+      </p>
+      <p>If you get your configuration hopelessly out of whack, just remove the 
+        file <font face="Courier New, Courier, mono">config.in</font> and run 
+        <font face="Courier New, Courier, mono">Configure</font> (or make). This 
+        will start over just as for a fresh installation. </p>
+      <p>When you change the configuration parameters it is a good idea to do 
+        a &quot;make very-clean&quot; before doing a &quot;./buildLiS&quot;. </p>
+      <h2><font size="4">Making CSLiS</font> </h2>
+      <p>You can make CSLiS by typing &quot;make; make install&quot; in the CSLiS 
+        installation directory. </p>
+      <p>The following make targets are defined. </p>
+      <table border="1" cellpadding="7" cellspacing="1">
+        <tr valign="top"> 
+          <td width="30%" height="8">Default target</td>
+          <td width="70%" height="8">Compile CSLiS plus binary drivers into streams.o. 
+            Copy to modules directory if configured to do so. Compile utility 
+            programs.</td>
+        </tr>
+        <tr valign="top"> 
+          <td>install</td>
+          <td>Makes the CSLiS library routines and utilities. Installs utilities 
+            in their proper directories. Runs <font size="2" face="Courier New">strmakenodes</font> 
+            to make <font size="2" face="Courier New">/dev</font> entries for 
+            STREAMS drivers.</td>
+        </tr>
+        <tr valign="top"> 
+          <td>uninstall</td>
+          <td>Removes the STREAMS utility programs and the files created in the 
+            /dev directory.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">clean</td>
+          <td width="70%" height="8">Remove all object code and utility programs. 
+            Leave configuration file in place.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">realclean</td>
+          <td width="70%" height="8">Like &quot;clean&quot; except remove configuration 
+            files as well.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">very-clean</td>
+          <td width="70%" height="8" valign="top">This is equivalent to &quot;make 
+            uninstall clean realclean&quot;.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">dep</td>
+          <td width="70%" height="8">Make dependencies. Done automatically by 
+            default target.</td>
+        </tr>
+        <tr valign="top"> 
+          <td width="30%" height="8">all</td>
+          <td width="70%" height="8">Like default target except skip steps requiring 
+            root login.</td>
+        </tr>
+      </table>
+      <h2 align="center"><font size="4">Utility Programs Made</font> </h2>
+      <p>In addition to the file <font face="Courier New, Courier, mono">streams.o</font>, 
+        which contains CSLiS and any STREAMS drivers linked with it, the build procedure 
+        also makes the following utility programs. These programs are copied to 
+        the indicated directory if the &quot;make&quot; uses the default make 
+        target and if you are logged in as &quot;root&quot;. These programs are 
+        documented <a href="cmds.html">separately</a>. </p>
+      <table border="1" cellpadding="7" cellspacing="1">
+        <tr> 
+          <td width="30%" height="8">/usr/sbin/streams</td>
+          <td width="70%" height="8">Prints out statistics from running CSLiS. Sets 
+            debug mask for CSLiS.</td>
+        </tr>
+        <tr> 
+          <td width="30%" height="8">/usr/src/LiS/util/linux/strconf</td>
+          <td width="70%" height="8">Interprets STREAMS driver Config file and 
+            generates corresponding config.h and makenodes.c files.</td>
+        </tr>
+        <tr> 
+          <td width="30%" height="8">/usr/sbin/strmakenodes</td>
+          <td width="70%" height="8">Program to make /dev entries for STREAMS 
+            drivers. The result of compiling makenodes.c.</td>
+        </tr>
+        <tr> 
+          <td width="30%" height="8">/usr/local/bin/strtst</td>
+          <td width="70%" height="8">A comprehensive test program for STREAMS.</td>
+        </tr>
+        <tr> 
+          <td width="30%" height="8">/usr/local/bin/timetst</td>
+          <td width="70%" height="8">Times round-trip delay from user application 
+            to STREAMS loopback driver.</td>
+        </tr>
+      </table>
+      <p>Of these programs, only <font face="Courier New, Courier, mono">strmakenodes</font> 
+        and <font face="Courier New, Courier, mono">strconf</font> are essential 
+        to the operation of CSLiS. <font face="Courier New, Courier, mono">Strmakenodes</font> 
+        must be run prior to attempting to use any STREAMS application programs 
+        to make the proper entries in the <font face="Courier New, Courier, mono">/dev</font> 
+        directory for STREAMS files. </p>
+      <p>The <font face="Courier New, Courier, mono">strconf</font> program is 
+        needed for the build of CSLiS itself. However, the CSLiS build executes the 
+        program from the local CSLiS installation directory. Thus it is not necessary 
+        to copy this program to <font face="Courier New, Courier, mono">/usr/sbin</font> 
+        in order to make <font face="Courier New, Courier, mono">streams.o</font>. 
+      </p>
+      <hr>
+      <h1><font size="5"><b>Configuration Procedure</b></font> </h1>
+      <p>The following sections describe the steps of the <font face="Courier New, Courier, mono">Configure</font> 
+        script. </p>
+      <h2><font size="4">User or Kernel</font></h2>
+      <p>The first question posed by the <font face="Courier New, Courier, mono">Configure</font> 
+        script is the type of environment that CSLiS is to run in. The default is 
+        to build CSLiS to run in the Linux kernel. You can also build a user-space 
+        version of CSLiS that can be used for &quot;laboratory&quot; testing. The 
+        QNX alternative is not useful.</p>
+      <h2><font size="4"><b>Kernel Source Location</b> </font></h2>
+      <p><font face="Courier New, Courier, mono">Configure</font> asks you for 
+        the location of your kernel source tree. The default is <font face="Courier New, Courier, mono">/usr/src/linux</font> 
+        and likely suffices for the vast majority of cases. Once <font face="Courier New, Courier, mono">Configure</font> 
+        has this information it can determine the version of the kernel for which 
+        you are compiling CSLiS.</p>
+      <p>If your kernel source has not had &quot;menuconfig&quot; run on it yet, 
+        <font face="Courier New, Courier, mono">Configure</font> will propose 
+        doing so at this time automatically. </p>
+      <p>Likewise, if you have not done a &quot;make dep&quot; on your kernel 
+        source yet, <font face="Courier New, Courier, mono">Configure</font> will 
+        propose doing so at this time automatically. </p>
+      <h2><font size="4"><b>Kernel Version Verification</b> </font></h2>
+      <p>The CSLiS <font face="Courier New, Courier, mono">Configure</font> script 
+        discovers the version of your kernel by looking in several places in your 
+        kernel source directory. If it cannot determine your kernel version the 
+        CSLiS configuration will terminate. The <font face="Courier New, Courier, mono">Configure</font> 
+        script cannot proceed without this information. </p>
+      <p>The <font face="Courier New, Courier, mono">Configure</font> script then 
+        asks for your verification of the kernel version for which CSLiS is to be 
+        compiled. Note, that the kernel for which you are compiling CSLiS does not 
+        have to be the kernel version on which your system is running. If you 
+        gave <font face="Courier New, Courier, mono">Configure</font> a pathname 
+        to your intended kernel source version in the previous step this could 
+        be a different kernel version than the one that is running on your machine. 
+      </p>
+      <p>You can also enter a kernel version other than the one found in version.h 
+        at this time. However, entering such a version may cause the subsequent 
+        &quot;make&quot; to make unverified assumptions about your kernel version. 
+        So be careful about answering this question with anything other than an 
+        Enter/Return. </p>
+      <p>If the kernel version displayed does not match your idea of the version 
+        of the kernel that resides at the indicated location on disk, it is probably 
+        best to terminate the <font face="Courier New, Courier, mono">Configure</font> 
+        program at this point and investigate rather than end up compilation or 
+        module loading errors. </p>
+      <h2><font size="4">Kernel Option Verification</font></h2>
+      <p>The <font face="Courier New, Courier, mono">Configure</font> script will 
+        ask you if you intend to run CSLiS on the same kernel that is running on 
+        the installation machine. This is the most common case of installing CSLiS, 
+        so the default answer is &quot;yes.&quot;</p>
+      <p>If you answer &quot;yes&quot; to this question then the <font face="Courier New, Courier, mono">Configure</font> 
+        script will verify that the kernel version in you kernel source directory 
+        matches the stated version of your running kernel. It will also verify 
+        that the kernel options of SMP and module versions are the same between 
+        the two kernel locations. If any discrepencies are found the installation 
+        of CSLiS will terminate.</p>
+      <p>It is important for the correct operation of CSLiS, and the STREAMS drivers 
+        that utilize CSLiS, that these options be in agreement between the running 
+        kernel and the kernel source. If they are not, the consequences can be 
+        anything from unresolved externals when attempting to load CSLiS all the 
+        way to system hangs on multi-CPU systems because of having the SMP option 
+        set incorrectly.</p>
+      <p>Therefore, it is important that you correct these problems and bring 
+        the kernel source and running kernel into agreement before installing 
+        CSLiS.</p>
+      <p>One common source of error is to recompile your kernel in <font face="Courier New, Courier, mono">/usr/src/linux</font> 
+        and run <font face="Courier New, Courier, mono">lilo</font>, but fail 
+        to copy the kernel executable to one of the kernel locations specified 
+        in <font face="Courier New, Courier, mono">/etc/lilo.conf</font>. In this 
+        case you may think that you have successfully compiled and booted a new 
+        kernel when, in fact, you are running on your old kernel.</p>
+      <h2><font size="4"><b>LiS Module Location</b></font> </h2>
+      <p>You will be asked whether or not you wish the &quot;make&quot; to copy 
+        the resulting <font face="Courier New, Courier, mono">streams.o</font> 
+        file to the modules directory associated with your selected kernel version. 
+        The alternative is to have &quot;make&quot; build <font face="Courier New, Courier, mono">streams.o</font> 
+        in the CSLiS directory and simply leave it there for manual copying later. 
+      </p>
+      <p>If you are intending to run CSLiS on the machine that you are using for 
+        the compilation you will probably want to answer this question with a 
+        &quot;y&quot;. If you are intending to compile on this machine and copy 
+        the result to another machine for testing, then &quot;n&quot; is the appropriate 
+        answer here. </p>
+      <h2><font size="4"><b>Debugging</b> </font></h2>
+      <p>If you intend to link CSLiS directly into the kernel and use GDB for kernel 
+        level debugging then you will likely want CSLiS to be compiled using the 
+        <font face="Courier New, Courier, mono">-g</font> option. <font face="Courier New, Courier, mono">Configure</font> 
+        asks you about this so that you can control whether to compile using <font face="Courier New, Courier, mono">-g</font> 
+        or not. </p>
+      <h2><font size="4"><a name="parampassing"></a>Parameter Passing Conventions</font></h2>
+      <p>The 2.6 Linux kernel can be compiled in a manner that causes parameters 
+        to subroutines to be passed in registers instead of the stack. Some distributions 
+        built around 2.6 are compiled this way by default.</p>
+      <p>If your driver calls kernel routines directly it must be compiled in 
+        the same manner as the kernel, either register parameters or stack parameters. 
+        A mismatch will almost certainly lead to system crashes.</p>
+      <p>When the kernel is compiled for register passing the C compiler command 
+        line option &quot;-mregparm=3&quot; is included by the kernel makefiles. 
+        Omitting this option yields the default stack passing code.</p>
+      <p>When the CSLiS <font face="Courier New, Courier, mono">Configure</font> 
+        script is run, usually implicitly via the initial &quot;make&quot;, it 
+        senses how the kernel was compiled and sets up the CSLiS compilation to 
+        include the <font face="Courier New, Courier, mono">regparm</font> option, 
+        or not.</p>
+      <p>In order to preserve STREAMS driver interface compatibility across different 
+        versions of the Linux kernel, CSLiS declares all functions that are called 
+        across the CSLiS/driver interface to use either stack parameter passing 
+        (the default) or register passing (see below) irrespective of the conventions 
+        used by the kernel.</p>
+      <p>Thus, to take the default case, the kernel can use register parameters 
+        but CSLiS will have all of its driver interface routines compiled so as 
+        to use stack parameters. This means that your STREAMS driver can be compiled 
+        for stack passing and can run with either convention in the kernel, without 
+        recompiling your driver.</p>
+      <p>You can use register passing conventions in your driver as well, if you 
+        like. As of this writing this feature is untesed. To do so, run the <font face="Courier New, Courier, mono">Configure</font> 
+        script and pass the following option:</p>
+      <p><font face="Courier New, Courier, mono">Configure --regparm=3</font></p>
+      <p>This sets the CSLiS/STREAMS-driver parameter passing interface independently 
+        of that used by the kernel. If you do this, be sure to compile your STREAMS 
+        driver using &quot;-mregparm=3&quot;.</p>
+      <p>The STREAMS driver interface routines that are called by CSLiS are:</p>
+      <ul>
+        <li>open, close, put and service routines called via the queue structures.</li>
+        <li>timeout and bufcall call-back routines.</li>
+        <li>driver initialization and termination routines.</li>
+        <li>driver interrupt service routines registered via CSLiS.</li>
+      </ul>
+      <p>The functions in CSLiS that are called by STREAMS drivers, and which also 
+        conform to the selected parameter passing convention, are all enumerated 
+        in the CSLiS file <font face="Courier New, Courier, mono">exports.c</font>.</p>
+      <h2><font size="4"><a name="choiceofcompiler"></a>Choice of Compiler</font></h2>
+      <p>The CSLiS <font face="Courier New, Courier, mono">Configure</font> script 
+        checks to see which compiler version was used to compile your kernel. 
+        It then attempts to locate a C compiler of the same version to use for 
+        compiling CSLiS. The script will print a message if it cannot find such 
+        a compiler.</p>
+    </td>
+
+  </tr>
+
+</table>
+
+<p align="left">&nbsp;</p>
+
+
+
+</body>
+
+
+
+</html>
+
+
+

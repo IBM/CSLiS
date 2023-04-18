@@ -1,0 +1,124 @@
+#
+# Copyright 2022 - IBM Inc. All rights reserved
+# SPDX-License-Identifier: LGPL-2.1
+#
+#  Script to automate building of LiS
+#
+# First check the current directory is /usr/src/LiS-2.19/ or /usr/src/LiS
+# If not, write error that not in proper path and exit:
+#
+RUNFROM=`pwd`
+LISHOME="/usr/src/CSLiS-"
+LISHOME2="/usr/src/LiS"
+if [[ $RUNFROM =~ /usr/src/CSLiS-.* ]]; then
+  echo "Directory $RUNFROM"
+else
+   if [ "$RUNFROM" != "$LISHOME2" ]
+   then
+      echo " Error: ./buildLiS not run from /usr/src/LiS-2.19 directory. "
+      echo " The buildLiS script requires home directory be $LISHOME or $LISHOME2. "
+      exit 9
+   fi
+fi 
+# Establish Linux version. For the following versions, only 
+#  make the build level. For higher versions, the KBUILD
+#  level needs to be build (found in the km26 directory).
+# 
+#
+export OPT_DEVICEBASE=190
+#
+while :
+do
+    DEVICE_OCCUPIED=`cat /proc/devices | grep $OPT_DEVICEBASE 2>/dev/null | wc -l`
+    if [ $DEVICE_OCCUPIED != 0 ]
+    then
+    #  check that the occupying device is not the clone
+       DEVICE_OCCUPIED_BASE=`cat /proc/devices | grep $OPT_DEVICEBASE | grep clone 2>/dev/null | wc -l`
+       if [ $DEVICE_OCCUPIED_BASE != 0 ]
+       then
+           echo " Device slot $OPT_DEVICEBASE is occupied by clone-dvr, will re-use this slot"
+           break;
+        else
+           echo " Device slot $OPT_DEVICEBASE is occupied"
+       fi
+    else
+        echo " Device slot $OPT_DEVICEBASE is empty"
+        break;
+    fi
+    OPT_DEVICEBASE=$(( $OPT_DEVICEBASE +1 ))
+    if [ $OPT_DEVICEBASE == 245 ]
+    then
+         # break out of loop, not enough slots left to matter
+         break;
+    fi
+#
+done
+#
+if [ $OPT_DEVICEBASE != 245 ] 
+then
+        export CONFIG_OPTS=" -N $OPT_DEVICEBASE "
+        echo "CONFIG_OPTS is: $CONFIG_OPTS"
+else
+    echo " No slot available for LiS BASE MAJOR device entry, abort build"
+    exit 6
+fi
+#
+#
+#  Issue "make" so that the questions for which kernel and more are answered
+  make
+  if [ $? != 0 ]
+  then
+     echo "Error in make, buildLiS script aborting"
+     exit 1
+  fi
+#
+#  Issue "make install" to set up base driver loads. This is all that is needed
+#  for the older release versions
+  make install
+  if [ $? != 0 ]
+  then
+     echo "Error in make install, buildLiS script aborting"
+     exit 2
+  fi
+#
+#   No test that older version is not installed, build from the km26 directory
+#
+if [ "x$LINUX_VENDOR" = "x" ]
+then
+#
+  export `grep KBIN /usr/src/LiS/config.in`
+  echo $KBIN
+  LINUX_TYPE=RPM
+  UBUNTU=`grep -i "ubuntu" /etc/os-release 2>/dev/null | wc -l`
+  if [ $UBUNTU -ne 0 ]; then
+     LINUX_TYPE=DEBIAN
+  fi
+  cd /usr/src/LiS/km26
+  make setup
+  if [ $? != 0 ]
+  then
+     echo "Error in ../km26 make setup, buildLiS script aborting"
+     exit 3
+  fi
+#
+# On RPM type systems, modules are made using SUBDIRS=
+# On Debian type, modules are made using M=
+#
+  export `grep MAKEDIRTYPE /usr/src/LiS/config.in`
+  make -C $KBIN $MAKEDIRTYPE=/usr/src/LiS/km26  modules LINUX_TYPE=$LINUX_TYPE
+    if [ $? != 0 ]
+  then
+     echo "Error in ../km26 make modules, buildLiS script aborting"
+     exit 4
+  fi
+  make install
+  if [ $? != 0 ]
+  then
+     echo "Error in ../km26 make install, buildLiS script aborting"
+     exit 5
+  fi
+#
+fi
+#
+echo "BuildLiS done, no errors reported"
+
