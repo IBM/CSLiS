@@ -153,6 +153,7 @@ int lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry,
 		       char *f, int l)
 {
     lis_flags_t     psw;
+
     int             ta_count;  /* Try Again Count to protect from looping */       
 
     qflg |= QOPENING ;

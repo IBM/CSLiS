@@ -1134,6 +1134,7 @@ lis_unlink_all(struct inode	*i,
 
     maj = getmajor(hd->sd_dev) ;
     again_cnt = 0;
+  
 again:
     if (lis_stdata_head == NULL)
 	return(rtn) ;
@@ -1155,9 +1156,8 @@ again:
 	hdp->sd_mux.mx_hd = NULL ;	/* just to be sure */
 	lis_doclose(NULL, NULL, hdp, creds) ;	/* close the mux */
 	if (again_cnt++ < 100)  /* Test to get out of loop if no response */
-	goto again ;			/* start over at head of list */
-    }
-
+    	goto again ;			/* start over at head of list *
+  }
     lis_spin_unlock(&lis_stdata_lock) ;
     return(rtn) ;
 
