@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.11 2023-02-27 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-02-02 12:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -4038,7 +4038,8 @@ void lis_tq_free_passfp( void *arg )
 void lis_free_passfp( mblk_t *mp )
 {
 #if defined(KERNEL_2_5)
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,11,0)
+/*  #if LINUX_VERSION_CODE < KERNEL_VERSION(5,11,0) */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,4,0)	
     	static DECLARE_TASKLET(lis_tq, lis_tq_free_passfp,0);
 #else
         static DECLARE_TASKLET_OLD(lis_tq, lis_tq_free_passfp);

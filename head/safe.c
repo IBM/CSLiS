@@ -35,7 +35,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) CSLiS safe.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS safe.c 7.111 2024-02-02 12:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -154,28 +154,36 @@ int lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry,
 {
     lis_flags_t     psw;
 
+    int             ta_count;  /* Try Again Count to protect from looping */       
+
     qflg |= QOPENING ;
+    ta_count = 0;
 
 try_again:
-    if (   mp == NULL
-	|| !LIS_QMAGIC(q,f,l)
+    LIS_QISRLOCK(q, &psw) ;   /* On s390x platform, the Locks needed before test */
+    if (   mp == NULL || q == NULL
+	|| q->q_magic != Q_MAGIC
 	|| q->q_qinfo == NULL
 	|| q->q_qinfo->qi_putp == NULL
        )
     {
+        LIS_QISRUNLOCK(q, &psw) ;
 	LOG(f, l, "NULL q, mp, q_qinfo or qi_putp in putmsg");
-	freemsg(mp) ;
+	if (mp != NULL)
+           freemsg(mp) ;
 	return(1) ;		/* message consumed */
     }
 
-    LIS_QISRLOCK(q, &psw) ;
     if (q->q_flag & (QPROCSOFF | QFROZEN))
     {
+        ta_count++;  /* count how many times checking queue */
 	if ((q->q_flag & QPROCSOFF) && SAMESTR(q))   /* there is a next queue */
 	{					/* pass to next queue */
 	    LIS_QISRUNLOCK(q, &psw) ;
-	    q = q->q_next ;
-	    goto try_again ;
+            if (ta_count < 1000) { /* if shutting down, but queues are busy, prevent loop */
+	       q = q->q_next ;
+	       goto try_again ;
+            }
 	}
 
 	lis_defer_msg(q, mp, retry, &psw) ;	/* put in deferred msg list */

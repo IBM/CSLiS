@@ -62,7 +62,7 @@
  *
  */
 
-#ident "@(#) CSLiS head.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS head.c 7.11 2024-01-22 16:10:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -1130,8 +1130,11 @@ lis_unlink_all(struct inode	*i,
     int			 maj ;
     int			 rtn = 0 ;
     int			 r ;
+    int                  again_cnt;  /* Test how many times in loop so not to deadlock on shutdown */
 
     maj = getmajor(hd->sd_dev) ;
+    again_cnt = 0;
+  
 again:
     if (lis_stdata_head == NULL)
 	return(rtn) ;
@@ -1152,9 +1155,9 @@ again:
 
 	hdp->sd_mux.mx_hd = NULL ;	/* just to be sure */
 	lis_doclose(NULL, NULL, hdp, creds) ;	/* close the mux */
-	goto again ;			/* start over at head of list */
-    }
-
+	if (again_cnt++ < 100)  /* Test to get out of loop if no response */
+    	goto again ;			/* start over at head of list *
+  }
     lis_spin_unlock(&lis_stdata_lock) ;
     return(rtn) ;
 
