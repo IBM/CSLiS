@@ -35,7 +35,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) CSLiS queue.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS queue.c 7.111 2024-05-07 15:30:00 "
 
 
 
@@ -43,6 +43,11 @@
 /*				 Dependencies                            */
 
 #include <sys/stream.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <sys/osif.h>
 #if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305)  //For RHEL 9 update 12-2022
 #include <stdarg.h>                    /* for va_list */

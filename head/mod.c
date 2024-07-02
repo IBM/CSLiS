@@ -35,7 +35,7 @@
  *    nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) CSLiS mod.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS mod.c 7.111 2024-05-07 15:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -56,6 +56,11 @@
 #include <linux/ioport.h>
 #undef module_info		/* LiS definition */
 #define module_info	kernel_module_info
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <linux/module.h>
 #undef module_info
 #include <linux/ptrace.h>	/* for pt_regs */

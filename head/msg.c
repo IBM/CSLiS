@@ -36,7 +36,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) CSLiS msg.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS msg.c 7.111 2024-05-07 15:30:00 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -77,7 +77,13 @@
 /*				 Dependencies                            */
 
 #include <sys/stream.h>
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0)
 #include <sys/osif.h>
+#endif
 
 /*  -------------------------------------------------------------------  */
 /*			       Symbols & types                           */

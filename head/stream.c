@@ -35,7 +35,8 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za, 100741.1151@compuserve.com
  */
 
-#ident "@(#) CSLiS stream.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS stream.c 7.111 2024-05-07 15:30:00 "
+
 
 
 /*  -------------------------------------------------------------------  */
@@ -43,6 +44,11 @@
 
 #include <sys/strport.h>
 #include <sys/stream.h>	/* this will include the whole stuff */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <sys/osif.h>
 
 /*  -------------------------------------------------------------------  */

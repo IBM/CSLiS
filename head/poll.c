@@ -34,7 +34,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) CSLiS poll.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS poll.c 7.111 2024-05-07 15:30:00 "
 
 #include <sys/stream.h>
 #ifdef LINUX_POLL
@@ -44,6 +44,11 @@
 #include <sys/poll.h>
 #endif
 #include <sys/lislocks.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <sys/osif.h>
 
 char	*lis_poll_file =

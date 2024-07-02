@@ -31,7 +31,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS lispci.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS lispci.c 7.111 2024-05-07 15:30:00 "
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lispci.h>		/* LiS PCI header file */
@@ -42,12 +42,21 @@
 # endif
 #include <linux/pci.h>		/* kernel PCI header file */
 
-#include <sys/osif.h>		/* LiS kernel interface */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
+#include <sys/osif.h>
+#else
+#define PCI_DMA_BIDIRECTIONAL   DMA_BIDIRECTIONAL
+#define PCI_DMA_TODEVICE        DMA_TO_DEVICE
+#define PCI_DMA_FROMDEVICE      DMA_FROM_DEVICE
+#define PCI_DMA_NONE            DMA_NONE
+#endif
+
 
 
 static lis_pci_dev_t	*lis_pci_dev_list = NULL ;
 static lis_pci_dev_t 	*lis_pci_dev_list_end = NULL ;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 
 /************************************************************************
 *                       lis_map_pci_device                              *
@@ -239,6 +248,8 @@ lis_pci_dev_t   * _RP lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 
 } /* lis_pci_find_slot */
 
+#endif  /* end kernel 6.0.0 check */
+
 
 /************************************************************************
 *                        lis_pci_read_config_byte                       *
@@ -401,6 +412,8 @@ void	 lis_pci_cleanup(void)
 *                         DMA Memory Allocation				*
 ************************************************************************/
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
+
 void    * _RP lis_pci_alloc_consistent(lis_pci_dev_t  *dev,
 				  size_t          size,
 				  lis_dma_addr_t *dma_handle)
@@ -439,6 +452,8 @@ void    * _RP lis_pci_free_consistent(lis_dma_addr_t *dma_handle)
     return(NULL) ;
 }
 
+#endif /* end kernel 6.0.0 check */
+
 u32      _RP lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)
 {
     u32		*p = (u32 *) dma_handle->opaque ;
@@ -452,6 +467,8 @@ u64      _RP lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)
 
     return(*p) ;
 }
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 
 void     _RP lis_pci_map_single(lis_pci_dev_t *dev,
 			   void         *ptr,
@@ -540,6 +557,7 @@ int      _RP lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)
     return(pci_set_dma_mask(dev->kern_ptr, mask)) ;
 }
 
+#endif  /* end kernel 6.0.0 check */ 
 
 /************************************************************************
 *                            Memory Barrier                             *

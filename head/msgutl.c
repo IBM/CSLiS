@@ -34,7 +34,7 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-#ident "@(#) CSLiS msgutl.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS msgutl.c 7.111 2024-05-07 15:30:00 "
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -75,6 +75,11 @@
 /*				 Dependencies                            */
 
 #include <sys/stream.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <sys/osif.h>
 
 /*  -------------------------------------------------------------------  */

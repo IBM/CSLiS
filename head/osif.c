@@ -31,7 +31,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS osif.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS osif.c 7.111 2024-05-07 15:30:00 "
 
 #include <sys/stream.h>
 #include <linux/version.h>
@@ -53,6 +53,17 @@
 #define PCI_STD_NUM_BARS	6	/* Number of standard BARs */
 #endif
 #endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#define PCI_DMA_BIDIRECTIONAL	DMA_BIDIRECTIONAL
+#define PCI_DMA_TODEVICE	DMA_TO_DEVICE
+#define PCI_DMA_FROMDEVICE	DMA_FROM_DEVICE
+#define PCI_DMA_NONE		DMA_NONE
+#define __iovec_defined 1
+#endif
+
 #include <linux/pci.h>		/* PCI BIOS functions */
 #include <linux/sched.h>		/* odd place for request_irq */
 #include <linux/ioport.h>		/* request_region */
@@ -364,6 +375,8 @@ void  _RP lis_osif_pci_unregister_driver( struct pci_driver *p )
 #endif /* < 2.3 */
 #endif          /* CONFIG_PCI */
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,0)
 
 	 /***************************************
@@ -390,8 +403,11 @@ void  _RP lis_osif_pci_free_consistent(struct pci_dev *hwdev, size_t size,
 #endif
 }
 #endif /* >= 2.4 */
+#endif /* end kernel 6.0.0. check */
 
 #ifdef CONFIG_PCI
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 dma_addr_t  _RP lis_osif_pci_map_single(struct pci_dev *hwdev, void *ptr,
 	                                        size_t size, int direction)
 {
@@ -468,6 +484,8 @@ int  _RP lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)
     return(pci_set_dma_mask(hwdev, mask)) ;
 }
 
+#endif /* end kernel 6.0.0. check */
+
 dma_addr_t  _RP lis_osif_sg_dma_address(struct scatterlist *sg)
 {
     return(sg_dma_address(sg)) ;
@@ -477,6 +495,8 @@ size_t  _RP lis_osif_sg_dma_len(struct scatterlist *sg)
 {
     return(sg_dma_len(sg)) ;
 }
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)      /* 2.4.13 or later */
 
@@ -493,6 +513,8 @@ void  _RP lis_osif_pci_unmap_page(struct pci_dev *hwdev,
 {
     pci_unmap_page(hwdev, dma_address, size, direction) ;
 }
+
+#endif /* end kernel 6.0.0. check */
 
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(2,5,0) 
 int  _RP lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)

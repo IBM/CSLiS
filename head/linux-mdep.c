@@ -45,16 +45,21 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-02-02 12:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-05-07 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
 
 #include <sys/LiS/linux-mdep.h>
 #include <sys/lislocks.h>
-#include <linux/module.h>
-#include <sys/LiS/modcnt.h>		/* after linux-mdep.h & module.h */
 #include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
+#include <linux/module.h>
+#include <sys/LiS/modcnt.h>             /* after linux-mdep.h & module.h */
 #if defined(KERNEL_2_5)
 #include <linux/init.h>
 #endif
@@ -73,8 +78,23 @@
 #include <sys/LiS/errmsg.h>	/* LiS err msg types */
 #include <sys/LiS/buffcall.h>	/* bufcalls */
 #include <sys/LiS/head.h>	/* stream head */
+#include <sys/stream.h>         /* LiS entry points */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0)
 #include <sys/osif.h>
-#include <sys/stream.h>		/* LiS entry points */
+#else   /* On later kernels, osif.h declarations collide with sockets */
+#include <linux/interrupt.h>
+#ifdef wake_up_interruptible
+#undef wake_up_interruptible
+#endif
+#define	wake_up_interruptible		lis_wake_up_interruptible
+#define	OSIF_WAIT_Q_ARG		wait_queue_head_t *wq
+void lis_wake_up_interruptible(OSIF_WAIT_Q_ARG) _RP;
+#ifdef do_gettimeofday
+#undef do_gettimeofday
+#endif
+#define do_gettimeofday			lis_osif_do_gettimeofday
+void lis_osif_do_gettimeofday( struct timeval *tp ) _RP;
+#endif
 #include <sys/cmn_err.h>
 #include <sys/poll.h>
 #include <linux/types.h>
@@ -1033,7 +1053,11 @@ lis_fd2str( int fd )
     stdata_t		* hd ;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+    if ( (file = lookup_fdget_rcu(fd)) == NULL)
+#else	    
     if ( (file = lookup_fd_rcu(fd)) == NULL)
+#endif 
 #else    
     if ( (file = fcheck(fd)) == NULL)
 #endif
@@ -1711,9 +1735,15 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     isb->i_mtime = CURRENT_TIME ;
     isb->i_ctime = CURRENT_TIME ;
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)    
     ktime_get_coarse_real_ts64(&isb->i_atime);
     ktime_get_coarse_real_ts64(&isb->i_mtime);
     ktime_get_coarse_real_ts64(&isb->i_ctime);
+#else
+    ktime_get_coarse_real_ts64(&isb->__i_atime);
+    ktime_get_coarse_real_ts64(&isb->__i_mtime);
+    ktime_get_coarse_real_ts64(&isb->__i_ctime);    
+#endif
 #endif    
     isb->i_op    = &lis_streams_iops;
 #if defined(KERNEL_2_5)
@@ -2379,9 +2409,15 @@ lis_new_inode( struct file *f, dev_t dev )
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
         new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)	
         ktime_get_coarse_real_ts64(&new->i_atime);
         ktime_get_coarse_real_ts64(&new->i_mtime);
         ktime_get_coarse_real_ts64(&new->i_ctime);
+#else
+        ktime_get_coarse_real_ts64(&new->__i_atime);
+        ktime_get_coarse_real_ts64(&new->__i_mtime);
+        ktime_get_coarse_real_ts64(&new->__i_ctime);	
+#endif	
 #endif
 	
 	/*
@@ -2693,9 +2729,15 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
     new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)    
     ktime_get_coarse_real_ts64(&new->i_atime);
     ktime_get_coarse_real_ts64(&new->i_mtime);
     ktime_get_coarse_real_ts64(&new->i_ctime);
+#else
+    ktime_get_coarse_real_ts64(&new->__i_atime);
+    ktime_get_coarse_real_ts64(&new->__i_mtime);
+    ktime_get_coarse_real_ts64(&new->__i_ctime);    
+#endif
 #endif    
 
     return(new) ;
@@ -4038,12 +4080,24 @@ void lis_tq_free_passfp( void *arg )
 void lis_free_passfp( mblk_t *mp )
 {
 #if defined(KERNEL_2_5)
-/*  #if LINUX_VERSION_CODE < KERNEL_VERSION(5,11,0) */
+
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2309) /* Red Hat version check */
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,4,0)  
+        static DECLARE_TASKLET(lis_tq, lis_tq_free_passfp,0);
+#else
+        static DECLARE_TASKLET_OLD(lis_tq, lis_tq_free_passfp);
+#endif
+
+#else  /* not Red Hat and level less than 9.4 */	
+       
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,4,0)	
     	static DECLARE_TASKLET(lis_tq, lis_tq_free_passfp,0);
 #else
         static DECLARE_TASKLET_OLD(lis_tq, lis_tq_free_passfp);
 #endif
+
+#endif  /* End of Red Have version check */	
 #else
     static struct tq_struct	 lis_tq ;
 #endif
@@ -4727,8 +4781,13 @@ void cleanup_module( void )
     lis_mnt->mnt_sb->s_bdev->bd_inode = &lis_tmpinode;
     lis_mnt->mnt_sb->s_bdev->bd_inode->i_mapping = &lis_tmpmapping;
 
-    if (__invalidate_device(lis_mnt->mnt_sb->s_bdev,NULL))  
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+    invalidate_bdev(lis_mnt->mnt_sb->s_bdev);
+    if (lis_mnt == NULL)
 
+#else    
+    if (__invalidate_device(lis_mnt->mnt_sb->s_bdev,NULL))  
+#endif
 #else
 
     /* The following RHEL_RELEASE_CODE check required since
@@ -5477,9 +5536,11 @@ int mount_permission(char * path)
     struct nameidata nd;
 #else
     struct path nd_path;
-#if LINUX_VERSION_CODE > KERNEL_VERSION(5,11,0)
-    struct user_namespace *ns_ptr;
 #endif
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+    struct mnt_idmap *idmap;
+#elif LINUX_VERSION_CODE > KERNEL_VERSION(5,11,0)
+    struct user_namespace *ns_ptr;
 #endif
     /*
      *  Always grant permission to superuser; no need for further checks
@@ -5540,7 +5601,11 @@ int mount_permission(char * path)
 	/* check permission(s) */
 	if (!error)
         {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(5,11,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+            idmap = mnt_idmap(nd_path.mnt);
+            error = inode_permission(idmap, inode, mask);
+
+#elif LINUX_VERSION_CODE > KERNEL_VERSION(5,11,0)
             if (inode->i_sb != NULL)
                 ns_ptr = inode->i_sb->s_user_ns; 
             else

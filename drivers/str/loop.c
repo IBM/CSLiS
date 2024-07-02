@@ -35,7 +35,7 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ident "@(#) CSLiS loop.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS loop.c 7.111 2024-05-07 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 
@@ -44,7 +44,13 @@
 #include <sys/stream.h>
 #include <sys/stropts.h>
 #include <linux/stat.h>		/* for S_IFCHR */
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 #include <sys/osif.h>
+#endif
 
 /*  -------------------------------------------------------------------  */
 

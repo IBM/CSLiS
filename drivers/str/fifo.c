@@ -41,7 +41,9 @@
  *  MA 02139, USA.
  */
 
-#ident "@(#) CSLiS fifo.c 7.11 2022-10-26 15:30:00 "
+
+#ident "@(#) CSLiS fifo.c 7.111 2024-05-07 15:30:00 "
+
 
 #include <sys/LiS/module.h>			/* must be VERY first include */
 
@@ -59,7 +61,14 @@
 #include <sys/lislocks.h>	/* semaphores */
 
 #include <linux/list.h>
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 #include <sys/osif.h>
+#endif
+
 
 /*
  *  Some configuration sanity checks

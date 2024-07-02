@@ -62,7 +62,7 @@
  *
  */
 
-#ident "@(#) CSLiS head.c 7.11 2024-01-22 16:10:00 "
+#ident "@(#) CSLiS head.c 7.11 2024-05-07 15:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -237,15 +237,21 @@ C) Open vs Close
 /* LiS implementation modules used */
 
 #include <sys/stream.h>
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif
 #include <sys/poll.h>
 #include <sys/LiS/errmsg.h>
 #if !defined(ERANGE) && defined(LINUX)
 #undef _ERRNO_H
 #define __need_Emath 1
-#included <errnos.h>
+#include <errnos.h>
 #endif
 #include <sys/lismem.h>			/* for lis_free_all_pages */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0)
 #include <sys/osif.h>
+#endif   
 #include <sys/cmn_err.h>
 
 #include <sys/LiS/modcnt.h>		/* for LIS_MODGET/LIS_MODPUT */
@@ -1137,27 +1143,28 @@ lis_unlink_all(struct inode	*i,
   
 again:
     if (lis_stdata_head == NULL)
-	return(rtn) ;
+        return(rtn) ;
 
     lis_spin_lock(&lis_stdata_lock) ;
     for (hdp = lis_stdata_head, n = 0;
-	 n == 0 || hdp != lis_stdata_head;
-	 hdp = hdp->sd_next, n++)
+         n == 0 || hdp != lis_stdata_head;
+         hdp = hdp->sd_next, n++)
     {
-	if (getmajor(hdp->sd_dev) != maj || hdp->sd_mux.mx_hd == NULL)
-	    continue ;			/* not our major, or not a ctl stream */
+        if (getmajor(hdp->sd_dev) != maj || hdp->sd_mux.mx_hd == NULL)
+            continue ;                  /* not our major, or not a ctl stream */
 
-	lis_spin_unlock(&lis_stdata_lock) ;	/* done w/stdata_head */
-	K_ATOMIC_INC(&hdp->sd_opencnt);	/* simulate "open" */
-	lis_head_get(hdp) ;
-	if ((r = lis_i_unlink(i, f, hdp, MUXID_ALL, I_PUNLINK, creds)) < 0)
-	    rtn = r ;			/* save error for return */
+        lis_spin_unlock(&lis_stdata_lock) ;     /* done w/stdata_head */
+        K_ATOMIC_INC(&hdp->sd_opencnt); /* simulate "open" */
+        lis_head_get(hdp) ;
+        if ((r = lis_i_unlink(i, f, hdp, MUXID_ALL, I_PUNLINK, creds)) < 0)
+            rtn = r ;                   /* save error for return */
 
-	hdp->sd_mux.mx_hd = NULL ;	/* just to be sure */
-	lis_doclose(NULL, NULL, hdp, creds) ;	/* close the mux */
-	if (again_cnt++ < 100)  /* Test to get out of loop if no response */
-    	goto again ;			/* start over at head of list *
-  }
+        hdp->sd_mux.mx_hd = NULL ;      /* just to be sure */
+        lis_doclose(NULL, NULL, hdp, creds) ;   /* close the mux */
+        if (again_cnt++ < 100)  /* Test to get out of loop if no response */
+        goto again ;                    /* start over at head of list */
+    }
+
     lis_spin_unlock(&lis_stdata_lock) ;
     return(rtn) ;
 

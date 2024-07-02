@@ -31,7 +31,8 @@
  *
  */
 
-#ident "@(#) CSLiS relay.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS relay.c 7.111 2024-05-07 15:30:00 "
+
 
 /*  -------------------------------------------------------------------  */
 
@@ -39,10 +40,18 @@
  * The module that goes by the name "relay3" is a separately loadable
  * module that is not configured into LiS.  Used for testing.
  */
+
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif 
+
 #include <sys/LiS/module.h>	/* first ... */
 
 #include <sys/stream.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 #include <sys/osif.h>
+#endif
 
 /*  -------------------------------------------------------------------  */
 /*			  Module definition structs                      */

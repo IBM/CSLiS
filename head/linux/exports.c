@@ -29,7 +29,7 @@
  * 
  */
 
-#ident "@(#) CSLiS exports.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS exports.c 7.111 2024-05-07 15:30:00 "
 
 #include <sys/LiS/linux-mdep.h>		/* redefine dev_t b4 any kernel incls */
 
@@ -45,6 +45,11 @@
 #define CONFIG_MODULES  1
 #define EXPORT_SYMTAB   1
 #define __NO_VERSION__	1	/* 2.2 kernel needs this */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define _LINUX_IF_H
+#define	IFNAMSIZ	16
+#define __iovec_defined 1
+#endif
 #include <linux/module.h>
 
 #ifndef EXPORT_SYMBOL_NOVERS
@@ -59,7 +64,6 @@
 #include <sys/lispci.h>
 #include <sys/cmn_err.h>
 #include <sys/osif.h>
-
 /************************************************************************
 *                           Prototypes                                  *
 *************************************************************************
@@ -227,6 +231,7 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_enable_device);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_disable_device);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_module_init);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_unregister_driver);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,0))
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_alloc_consistent);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_free_consistent);
@@ -239,11 +244,14 @@ EXPORT_SYMBOL_NOVERS(lis_osif_pci_dma_sync_single);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dma_sync_sg);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dma_supported);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_set_dma_mask);
+#endif
 EXPORT_SYMBOL_NOVERS(lis_osif_sg_dma_address);
 EXPORT_SYMBOL_NOVERS(lis_osif_sg_dma_len);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)      /* 2.4.13 or later */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_map_page);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_unmap_page);
+#endif
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(2,5,0)
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_set_dma_mask);
 EXPORT_SYMBOL_NOVERS(lis_osif_pci_dac_dma_supported);

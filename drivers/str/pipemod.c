@@ -28,8 +28,12 @@
  *  MA 02139, USA.
  */
 #define PIPE_DEBUG 1
-#ident "@(#) CSLiS pipemod.c 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS pipemod.c 7.111 2024-05-07 15:30:00 "
 
+#ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
+#endif  
 #include <sys/LiS/module.h>	/* should be first */
 
 #include <sys/LiS/config.h>
@@ -38,6 +42,10 @@
 #include <sys/stropts.h>
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,27)
     #undef __always_inline
+#endif
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+#define _LINUX_IF_H
+#define IFNAMSIZ        16
 #endif
 #include <sys/errno.h>
 #include <sys/cmn_err.h>
