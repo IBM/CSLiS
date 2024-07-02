@@ -1140,6 +1140,7 @@ lis_unlink_all(struct inode	*i,
 
     maj = getmajor(hd->sd_dev) ;
     again_cnt = 0;
+  
 again:
     if (lis_stdata_head == NULL)
         return(rtn) ;

@@ -1,0 +1,12 @@
+Title:          CSLiS - "Communications Server Linux  STREAMS"
+Desc1:          CSLiS is a STREAMS framework which is compatible with
+Desc2:          SVR4 STREAMS.  It is based off the LiS-2.19 open source package
+Desc3:          with updates to support s390x, ppc64le and automated builds.
+Desc4:          Used primarily to schedule networking tasks for Communications Server.
+Desc5:		It allows for installation of binary drivers.
+Author:         Jeff L Smith, Richard Hilditch, others
+InfoSources1:   <http://github.com/IBM/CSLiS> CSLiS web home page
+Assistance:     assistance appreciated
+CurrentStat:    Operational
+ETA:            Available
+

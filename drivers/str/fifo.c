@@ -41,7 +41,9 @@
  *  MA 02139, USA.
  */
 
+
 #ident "@(#) CSLiS fifo.c 7.111 2024-05-07 15:30:00 "
+
 
 #include <sys/LiS/module.h>			/* must be VERY first include */
 
@@ -66,6 +68,7 @@
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 #include <sys/osif.h>
 #endif
+
 
 /*
  *  Some configuration sanity checks

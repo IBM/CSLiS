@@ -52,6 +52,7 @@
 #endif
 
 
+
 static lis_pci_dev_t	*lis_pci_dev_list = NULL ;
 static lis_pci_dev_t 	*lis_pci_dev_list_end = NULL ;
 
@@ -248,6 +249,7 @@ lis_pci_dev_t   * _RP lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 } /* lis_pci_find_slot */
 
 #endif  /* end kernel 6.0.0 check */
+
 
 /************************************************************************
 *                        lis_pci_read_config_byte                       *

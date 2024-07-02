@@ -1885,7 +1885,7 @@ Do you want to do that now?"
        KBUILD_NEEDS_MODNAME=y
     elif [ "$KVER_MAJOR" = "3" ]; then  # for any > 3.0 
        KBUILD_NEEDS_MODNAME=y
-       KBUILD_NEEDS_SYMVERS=y
+       KBUILD_NEEDS_SYMVERS=Y
     elif [ $KVER_MAJOR -ge 4 ]; then  # for any > 4 
        KBUILD_NEEDS_MODNAME=y
        KBUILD_NEEDS_SYMVERS=y
