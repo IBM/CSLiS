@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-05-07 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-08-06 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -4478,9 +4478,13 @@ int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
 #if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305) || \
      (LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0))) /* version less than RHEL 9.2 and SLES 15 SP5 */ 
   mm_segment_t old_fs;
+#else  /* for RHEL 9 and later */
+#define I_STR32	    (__SID | 48)   /* Construct an internal STREAMS `ioctl32' */
+  int old_cmd;                     /* RHEL 9 and later cannot copy_from_user when buffer is not in User space */
 #endif  
   char * datap = NULL;
   int rc;
+  long rc_l;
 
   ptr32 = (strioctl32_t*)arg;
   if (copy_from_user((void*)&par32,(void*)ptr32,sizeof(strioctl32_t)))
@@ -4543,6 +4547,7 @@ int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
   {
     par64.ic_dp = NULL;
   }
+
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,11,0)  
   old_fs = get_fs();
   set_fs(KERNEL_DS);
@@ -4550,10 +4555,15 @@ int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
 #if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305) || \
      (LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0))) /* version less than RHEL 9.2 and SLES 15 SP5 */  
   old_fs = force_uaccess_begin();
+#else
+  old_cmd = cmd;    /* Save original CMD flag, and pass I_STR32 to signal memcpy() and no lis_copyin() */
+  cmd = I_STR32;
+  par64.ic_cmd = cmd;  
 #endif  
 #endif  
 #if LINUX_VERSION_CODE > KERNEL_VERSION(3,0,8)
-  rc = lis_unlocked_ioctl (fp, cmd, (unsigned long)&par64);
+  rc_l = lis_unlocked_ioctl (fp, cmd, (unsigned long)&par64);
+  rc = rc_l;
 #elif LINUX_VERSION_CODE > KERNEL_VERSION(2,6,13)
   rc = lis_strioctl(NULL, fp, cmd, (unsigned long)&par64);
 #else
@@ -4565,6 +4575,9 @@ int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
 #if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE < 2305) || \
      (LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0))) /* version less than RHEL 9.2 and SLES 15 SP5 */  
   force_uaccess_end(old_fs);
+#else
+  par64.ic_cmd = old_cmd;
+  cmd = old_cmd;  /* restore old cmd setting fromI_ STR32 to I_STR */  
 #endif  
 #endif  
  
