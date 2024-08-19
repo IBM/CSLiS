@@ -2348,12 +2348,14 @@ elif [ "$MACHINE" = "s390x" ]; then
        if [ $RHEL8 -ne 0 ] || [ $SLES15 -ne 0 ]; then
           NO32OVER64BUILD=y
        fi
-   fi   
-fi
+   fi
 # For SLES 15 SP2 SPLITUSERKERNEL and NO32OVER64BUILD is set
-if [ $KVER_MAJOR -ge 5 ]; then
+elif [ $KVER_MAJOR -ge 5 ]; then
    SPLITUSERKERNEL=y
-   NO32OVER64BUILD=y
+   RHEL89=`grep "Red Hat Enterprise Linux " /etc/os-release 2>/dev/null | wc -l`
+   if [ $RHEL89 -eq 0 ]; then
+      NO32OVER64BUILD=y
+   fi
 fi
 # the following checks for post-2.4 kernels by version, but also
 # sets some other related variables
