@@ -62,7 +62,7 @@
  *
  */
 
-#ident "@(#) CSLiS head.c 7.11 2024-05-07 15:30:00 "
+#ident "@(#) CSLiS head.c 7.11 2024-08-06 15:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -276,6 +276,10 @@ C) Open vs Close
 #define f_dentry f_path.dentry
 #endif
 
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+#define I_STR32     (__SID | 48)   /* Construct an internal STREAMS `ioctl32' */
+#endif
 
 /*
  * Defines for measuring time intervals
@@ -1140,7 +1144,6 @@ lis_unlink_all(struct inode	*i,
 
     maj = getmajor(hd->sd_dev) ;
     again_cnt = 0;
-  
 again:
     if (lis_stdata_head == NULL)
         return(rtn) ;
@@ -3713,7 +3716,6 @@ lis_wait_for_wiocing(stdata_t *hd, int tmout, int ignore_errors)
 }/*lis_wait_for_wiocing*/
 
 /*  -------------------------------------------------------------------  */
-
 /* copyout bmlks for reads
  */
 static int 
@@ -3748,6 +3750,34 @@ copyout_blks(struct file *f, char *ubuff, long count, mblk_t *mp)
 }
 
 /*  -------------------------------------------------------------------  */
+/* Uses memcpy because buff is 64-bit stub for 32-bit control block
+ * */
+static int
+memcopyout_blks(struct file *f, char *ibuff, long count, mblk_t *mp)
+{
+    mblk_t *mb;
+    long ocount=count;
+    int len;
+    int err = 0 ;
+
+    for (mb=mp ; mb && count > 0; mp=mb)
+    {
+        mb=mp->b_cont;                          /* next buffer in chain */
+        mp->b_cont = NULL ;                     /* unchain this buffer */
+        len=lis_min(count,lis_mblksize(mp));        /* size of current bfr */
+        memcpy(ibuff,mp->b_rptr,len);              /* cpy out current bfr */
+        count -=len;
+        ibuff +=len;
+        lis_freeb(mp);                          /* free current buffer */
+    }
+
+    if (count != 0)                     /* hopefully, copied whole buffer */
+        printk("LiS:memcopyout_blks:"
+                  "count (%ld) doesn't match data (%ld)", ocount, ocount-count);
+    return(0) ;
+}
+
+/*  -------------------------------------------------------------------  */
 /* strdoioctl - ioctl handler used by strioctl
  *
  * There is a special circumstance in which this routine is called
@@ -3771,6 +3801,10 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 #if (defined(_X86_64_LIS_))
     int minus_err ;
 #endif
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+    int save_cmd;
+#endif    
 
     /* Use RTN after getting wioc semaphore */
 #define RTN(v)	do { errv=(v); goto return_point; } while (0)
@@ -3792,9 +3826,23 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	if (do_copyin && 
 	    (err=lis_check_umem(f,VERIFY_READ,ioc->ic_dp,ioc->ic_len))<0)
 	{
-	    ioc->ic_len = 0 ;		/* no data */
-	    CLOCKOFF(IOCTLTIME) ;
-	    return(err);
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+            if (ioc->ic_cmd != I_STR32)
+            {	
+#endif		    
+	      ioc->ic_len = 0 ;		/* no data */
+	      CLOCKOFF(IOCTLTIME) ;
+	      return(err);
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+            }
+            else
+           {
+              err = 0;    /* on 32-bit interface RHEL 9 and later, this is not an error */
+             /*  printk(" lis_strdoioctl I_STR32 buffer check salvage \n"); */
+           }
+#endif	   
 	}
 	if ((mdta=allocb(
 	            ioc->ic_len == TRANSPARENT ? sizeof(ioc->ic_dp)
@@ -3807,13 +3855,31 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	}
 	if (do_copyin)
 	{
-	    if ((err = lis_copyin(f,mdta->b_wptr,ioc->ic_dp,ioc->ic_len)) < 0)
-	    {
-		ioc->ic_len = 0 ;		/* no data */
-		lis_freemsg(mioc);
-		CLOCKOFF(IOCTLTIME) ;
-		return(err) ;
-	    }
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+           if (ioc->ic_cmd == I_STR32) {
+	    memcpy((void *)mdta->b_wptr,(void *)ioc->ic_dp,ioc->ic_len);
+	   } 
+	   else 
+	   {
+             if ((err = lis_copyin(f,mdta->b_wptr,ioc->ic_dp,ioc->ic_len)) < 0)
+               {
+                 ioc->ic_len = 0 ;               /* no data */
+                 lis_freemsg(mioc);
+                 CLOCKOFF(IOCTLTIME) ;
+                 return(err) ;
+               }
+	   }
+  	   
+#else
+           if ((err = lis_copyin(f,mdta->b_wptr,ioc->ic_dp,ioc->ic_len)) < 0)
+            {
+                ioc->ic_len = 0 ;               /* no data */
+                lis_freemsg(mioc);
+                CLOCKOFF(IOCTLTIME) ;
+                return(err) ;
+            }
+#endif
 	    mdta->b_wptr += ioc->ic_len;
 	}
 	else
@@ -3865,6 +3931,15 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	ioc->ic_len = 0 ;		/* no data */
 	RTN(err) ;
     }
+
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+    if (ioc->ic_cmd == I_STR32) {
+            save_cmd = I_STR32;
+    	    iocb->ioc_cmd = I_STR;   /* Reset for message handling */
+    }
+#endif
+
 
     if ( LIS_DEBUG_IOCTL )
 	printk("lis_strdoioctl: send %s to \"%s\" on stream %s, cmd(0x%x)\n",
@@ -3950,14 +4025,34 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	    {
 		if (len > 0)
 		{				/* data to return */
-		    if ((err=lis_check_umem(f,VERIFY_WRITE,ioc->ic_dp,len)) < 0)
-			rval = err ;		/* oops... */
-		    else
-		    {
-			copyout_blks(f,ioc->ic_dp, len, dat);
-			dat = NULL;		/* see copyout_blks() */
-			ioc->ic_len = len ;	/* length */
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+                    if (ioc->ic_cmd == I_STR32) {
+                        memcopyout_blks(f,ioc->ic_dp, len, dat);
+                        dat = NULL;             /* see memcopyout_blks() */
+                        ioc->ic_len = len ;     /* length */
+                    }
+                    else
+	            {		    
+		       if ((err=lis_check_umem(f,VERIFY_WRITE,ioc->ic_dp,len)) < 0)
+		           rval = err ;		/* oops... */
+		       else
+		       {
+		  	  copyout_blks(f,ioc->ic_dp, len, dat);
+			  dat = NULL;		/* see copyout_blks() */
+			  ioc->ic_len = len ;	/* length */
+		       }
 		    }
+#else  /* Not RHEL 9 */
+                    if ((err=lis_check_umem(f,VERIFY_WRITE,ioc->ic_dp,len)) < 0)
+                        rval = err ;         /* oops... */
+                    else
+                    {
+                       copyout_blks(f,ioc->ic_dp, len, dat);
+                       dat = NULL;           /* see copyout_blks() */
+                       ioc->ic_len = len ;   /* length */
+                    }
+#endif
 		}
 		else				/* no data to return */
 		if (dat)			/* however, have empty bfr */
@@ -6690,7 +6785,7 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	    RTN(res);
 	}
 	break;
-    case I_STR:	
+    case I_STR:
 	if (F_ISSET(hd->sd_flag,STRHUP|STRCLOSE))
 	    RTN(-ENXIO);
 	else {
@@ -6717,6 +6812,34 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	    RTN(res);
 	}
 	break;
+
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+     (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
+/*   RHEL 9 and later does not allow copy_to_user or copy_from_user 
+ *                                        to use non-User space dest/src */
+    case I_STR32:
+        if (F_ISSET(hd->sd_flag,STRHUP|STRCLOSE))
+            RTN(-ENXIO);
+        else {
+            strioctl_t ioc;
+            int res;
+	    memcpy((void *)&ioc,(void *)arg,sizeof(strioctl_t));
+            CLOCKADD() ;
+            res = lis_strdoioctl(f,hd,&ioc,&creds,1);
+            CLOCKON() ;
+            if (res == 0)
+		memcpy((void *)arg,(void *)&ioc,sizeof(strioctl_t));    
+            if ( LIS_DEBUG_IOCTL )
+             printk("lis_strioctl(...,I_STR32,...) "
+                    " \"%s\" >> ic_cmd=0x%x ic_timout=%d ic_len=%d rslt=%d\n",
+                    hd->sd_name,
+                    ioc.ic_cmd, ioc.ic_timout, ioc.ic_len, res) ;
+
+            RTN(res);
+        }
+        break;
+#endif
+
     case I_PUSH:		/* tested */
 	if (F_ISSET(hd->sd_flag,STRHUP|STRCLOSE))
         {
