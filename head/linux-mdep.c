@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-08-06 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-09-06 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -1053,7 +1053,7 @@ lis_fd2str( int fd )
     stdata_t		* hd ;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0)
-#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,8,0)
     if ( (file = lookup_fdget_rcu(fd)) == NULL)
 #else	    
     if ( (file = lookup_fd_rcu(fd)) == NULL)
@@ -1735,7 +1735,7 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     isb->i_mtime = CURRENT_TIME ;
     isb->i_ctime = CURRENT_TIME ;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)    
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)    
     ktime_get_coarse_real_ts64(&isb->i_atime);
     ktime_get_coarse_real_ts64(&isb->i_mtime);
     ktime_get_coarse_real_ts64(&isb->i_ctime);
@@ -2409,7 +2409,7 @@ lis_new_inode( struct file *f, dev_t dev )
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
         new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)	
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)	
         ktime_get_coarse_real_ts64(&new->i_atime);
         ktime_get_coarse_real_ts64(&new->i_mtime);
         ktime_get_coarse_real_ts64(&new->i_ctime);
@@ -2729,7 +2729,7 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
     new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)    
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)    
     ktime_get_coarse_real_ts64(&new->i_atime);
     ktime_get_coarse_real_ts64(&new->i_mtime);
     ktime_get_coarse_real_ts64(&new->i_ctime);
