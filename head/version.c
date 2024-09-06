@@ -38,7 +38,7 @@
 
 
 char	lis_version[] = "CS71110" ;
-char	lis_date[]    = "06 Aug 24" ;
+char	lis_date[]    = "09 Sep 24" ;
 
 #if 0
 
