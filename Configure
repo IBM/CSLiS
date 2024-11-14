@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: LGPL-2.1
 #
 
-Configure_version="4.900 01/21/20"
+Configure_version="7.1111 11/14/24"
 
 if [ -f /proc/kallsyms ]; then
     KSYMS=/proc/kallsyms
@@ -2341,14 +2341,18 @@ elif [ "$MACHINE" = "ppc64le" ]; then
        NO32OVER64BUILD=y
 # For SLES 15, RHEL 8 and later on s390x... not 32bit compatibility
 elif [ "$MACHINE" = "s390x" ]; then
-   if [ ${KVER_MAJOR} -ge 5  ] || [ $KVER_MAJOR -eq 4 -a $KVER_MINOR -ge 12 ]; then
+   if [ ${KVER_MAJOR} -ge 5  ]; then
+       SPLITUSERKERNEL=y
+       NO32OVER64BUILD=y
+   elif [ $KVER_MAJOR -eq 4 -a $KVER_MINOR -ge 12 ]; then
        SPLITUSERKERNEL=y
        RHEL8=`grep "Red Hat Enterprise Linux 8" /etc/os-release 2>/dev/null | wc -l`
        SLES15=`grep "Enterprise Server 15" /etc/os-release 2>/dev/null | wc -l`
        if [ $RHEL8 -ne 0 ] || [ $SLES15 -ne 0 ]; then
           NO32OVER64BUILD=y
        fi
-   fi
+   fi   
+
 # For SLES 15 SP2 SPLITUSERKERNEL and NO32OVER64BUILD is set
 elif [ $KVER_MAJOR -ge 5 ]; then
    SPLITUSERKERNEL=y

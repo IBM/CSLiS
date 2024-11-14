@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-09-06 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-11-14 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -4794,7 +4794,9 @@ void cleanup_module( void )
     lis_mnt->mnt_sb->s_bdev->bd_inode = &lis_tmpinode;
     lis_mnt->mnt_sb->s_bdev->bd_inode->i_mapping = &lis_tmpmapping;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+ #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)) || \
+     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
+      (defined(_S390X_LIS_)))) //For RHEL 9.4 & zLinux or Kernel 6	
     invalidate_bdev(lis_mnt->mnt_sb->s_bdev);
     if (lis_mnt == NULL)
 
