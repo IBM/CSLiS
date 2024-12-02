@@ -62,7 +62,7 @@
  *
  */
 
-#ident "@(#) CSLiS head.c 7.11 2024-08-06 15:30:00 "
+#ident "@(#) CSLiS head.c 7.11 2024-12-02 15:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -251,7 +251,7 @@ C) Open vs Close
 #include <sys/lismem.h>			/* for lis_free_all_pages */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,14,0)
 #include <sys/osif.h>
-#endif   
+#endif
 #include <sys/cmn_err.h>
 
 #include <sys/LiS/modcnt.h>		/* for LIS_MODGET/LIS_MODPUT */
@@ -276,7 +276,7 @@ C) Open vs Close
 #define f_dentry f_path.dentry
 #endif
 
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
 #define I_STR32     (__SID | 48)   /* Construct an internal STREAMS `ioctl32' */
 #endif
@@ -1251,7 +1251,9 @@ int	lis_i_link(struct inode	*i,
     ioc.ic_dp	 = (char*)&lnk;
     SET_SD_FLAG(muxed,STPLEX);
     lis_head_get(muxed) ;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0) /* 6 Kernel added increment in fopen() */    
     K_ATOMIC_INC(&muxed->sd_opencnt);		/* so close won't deallocate */
+#endif
     muxed->sd_linkcnt++ ;			/* one more I_LINK */
     CP(hd,muxed->sd_rq) ;
     CLOCKADD() ;
@@ -2524,7 +2526,6 @@ push_mod( stdata_t *head, streamtab_t *mod, int id,
     lis_fmod_sw[id].f_count++ ;
 
 return_error:
-
     lis_unfreezestr(head->sd_rq) ;
 
     return(err);
@@ -2583,7 +2584,9 @@ pop_mod( stdata_t *head, int flags, cred_t *creds )
 
 	lis_qdetach( LIS_RD(wqn), 1, flags, creds );
 	if (wqnn != NULL)
+	{
 	    lis_unfreezestr(wqnn) ;
+	}    
     }
 
     return(0);
@@ -3801,7 +3804,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 #if (defined(_X86_64_LIS_))
     int minus_err ;
 #endif
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
     int save_cmd;
 #endif    
@@ -3826,7 +3829,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	if (do_copyin && 
 	    (err=lis_check_umem(f,VERIFY_READ,ioc->ic_dp,ioc->ic_len))<0)
 	{
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
             if (ioc->ic_cmd != I_STR32)
             {	
@@ -3834,7 +3837,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	      ioc->ic_len = 0 ;		/* no data */
 	      CLOCKOFF(IOCTLTIME) ;
 	      return(err);
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
             }
             else
@@ -3855,7 +3858,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	}
 	if (do_copyin)
 	{
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
            if (ioc->ic_cmd == I_STR32) {
 	    memcpy((void *)mdta->b_wptr,(void *)ioc->ic_dp,ioc->ic_len);
@@ -3932,7 +3935,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	RTN(err) ;
     }
 
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
     if (ioc->ic_cmd == I_STR32) {
             save_cmd = I_STR32;
@@ -4025,7 +4028,7 @@ lis_strdoioctl(struct file *f, stdata_t *hd,
 	    {
 		if (len > 0)
 		{				/* data to return */
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
                     if (ioc->ic_cmd == I_STR32) {
                         memcopyout_blks(f,ioc->ic_dp, len, dat);
@@ -6813,7 +6816,7 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	}
 	break;
 
-#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) || \
+#if ((defined(_X86_64_LIS_)) && (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
      (LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0))) /* version >= RHEL 9 */
 /*   RHEL 9 and later does not allow copy_to_user or copy_from_user 
  *                                        to use non-User space dest/src */
