@@ -33,10 +33,11 @@ onward (through 6.x).
 The LiS software resides outside the kernel source tree.  It runs
 as a loadable module.
 
-Latest update has correction to Linux 6.8.0 Kernel support to support Ubuntu 24.04 LTS.
-The SNA node would hand on restart of the node on Ubuntu 24.04 LTS distrobutions. Fix was made and 
-the updates applied December 02, 2024. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
-and check date is at least 02 Dec 2024.
+Latest update superseeds the December 02, 2024 fix. On December 05, 2024, Issue #25 was 
+addressed and fixed. It fixes a problem in compile on SLES 15 SP6 that references newer time variables
+that the distro change to revert back to using older time variables. Fix was made and 
+the updates applied December 05, 2024. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
+and check date is at least 05 Dec 2024. The version will show a "CS7111A" for this new fix.
 
 Jeff L Smith
 <jefsmith@us.ibm.com>
