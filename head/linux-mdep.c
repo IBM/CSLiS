@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-11-14 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-12-05 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -1053,7 +1053,7 @@ lis_fd2str( int fd )
     stdata_t		* hd ;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,11,0)
-#if LINUX_VERSION_CODE > KERNEL_VERSION(6,8,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(6,4,0)
     if ( (file = lookup_fdget_rcu(fd)) == NULL)
 #else	    
     if ( (file = lookup_fd_rcu(fd)) == NULL)
@@ -1735,7 +1735,7 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     isb->i_mtime = CURRENT_TIME ;
     isb->i_ctime = CURRENT_TIME ;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)    
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,4,0)    
     ktime_get_coarse_real_ts64(&isb->i_atime);
     ktime_get_coarse_real_ts64(&isb->i_mtime);
     ktime_get_coarse_real_ts64(&isb->i_ctime);
@@ -2409,7 +2409,7 @@ lis_new_inode( struct file *f, dev_t dev )
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
         new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)	
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,4,0)	
         ktime_get_coarse_real_ts64(&new->i_atime);
         ktime_get_coarse_real_ts64(&new->i_mtime);
         ktime_get_coarse_real_ts64(&new->i_ctime);
@@ -2729,7 +2729,7 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
     new->i_atime = new->i_mtime = new->i_ctime = CURRENT_TIME;
 #else
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,8,0)    
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,4,0)    
     ktime_get_coarse_real_ts64(&new->i_atime);
     ktime_get_coarse_real_ts64(&new->i_mtime);
     ktime_get_coarse_real_ts64(&new->i_ctime);
@@ -4580,7 +4580,7 @@ int lis_ioctl32_str (unsigned int fd, unsigned int cmd, unsigned long arg)
   cmd = old_cmd;  /* restore old cmd setting fromI_ STR32 to I_STR */  
 #endif  
 #endif  
- 
+
   if (copy_to_user((void*)&(ptr32->ic_cmd),(void*)&(par64.ic_cmd),sizeof(int)))
   {
     printk("Unable to return command parameter for 32 bit ioctl I_STR\n");
@@ -4616,7 +4616,7 @@ ioctl32_end:
   {
     FREE(datap);
   }
- 
+
   return(rc);
 }
 #endif
@@ -4794,9 +4794,9 @@ void cleanup_module( void )
     lis_mnt->mnt_sb->s_bdev->bd_inode = &lis_tmpinode;
     lis_mnt->mnt_sb->s_bdev->bd_inode->i_mapping = &lis_tmpmapping;
 
- #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)) || \
-     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
-      (defined(_S390X_LIS_)))) //For RHEL 9.4 & zLinux or Kernel 6	
+#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)) || \
+    ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
+     (defined(_S390X_LIS_)))) //For RHEL 9.4 & zLinux			
     invalidate_bdev(lis_mnt->mnt_sb->s_bdev);
     if (lis_mnt == NULL)
 
