@@ -33,11 +33,11 @@ onward (through 6.x).
 The LiS software resides outside the kernel source tree.  It runs
 as a loadable module.
 
-Latest update superseeds the December 02, 2024 fix. On December 05, 2024, Issue #25 was 
-addressed and fixed. It fixes a problem in compile on SLES 15 SP6 that references newer time variables
-that the distro change to revert back to using older time variables. Fix was made and 
-the updates applied December 05, 2024. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
-and check date is at least 05 Dec 2024. The version will show a "CS7111A" for this new fix.
+Latest update superseeds the December 05, 2024 fix. On December 13, 2024, Issue #26 was 
+addressed and fixed. It fixes a problem in compile on RHEL 9.5 (5.14.0 leve) for ppc64le and x86_64 platforms where
+"invalidate_device()" call was changed to "invalidate_bdev()" (a Linux 6 kernel change). 
+Fix was made and the updates applied December 13, 2024. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
+and check date is at least 13 Dec 2024. The version will show a "CS7111B" for this new fix.
 
 Jeff L Smith
 <jefsmith@us.ibm.com>
