@@ -3,7 +3,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: Jeff L Smith
- * RCS Id          : $Id: linux-mdep.c,v 7.11 2022/10/26 15:30:00 steve Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 7.11 2024/12/13 15:30:00 steve Exp $
  * Purpose         : provide Linux kernel <-> CSLiS entry points.
  * ----------------______________________________________________
  *
@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-12-05 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.111 2024-12-13 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -4794,9 +4794,16 @@ void cleanup_module( void )
     lis_mnt->mnt_sb->s_bdev->bd_inode = &lis_tmpinode;
     lis_mnt->mnt_sb->s_bdev->bd_inode->i_mapping = &lis_tmpmapping;
 
+   /*                                                                *
+    *  If Kernel GT 6, OR RHEL is 9.4 AND zLinux, OR RHEL is 9.5 and * 
+    *      PSeries or Intel                                          */
+
 #if ((LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)) || \
     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2305) && \
-     (defined(_S390X_LIS_)))) //For RHEL 9.4 & zLinux			
+     ((defined(_S390X_LIS_)))) || \
+    ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2308) && \	       	
+     ((defined(_X86_64_LIS_) || defined(_PPC64_LIS_)))))
+	    		    
     invalidate_bdev(lis_mnt->mnt_sb->s_bdev);
     if (lis_mnt == NULL)
 
