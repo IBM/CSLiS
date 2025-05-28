@@ -31,7 +31,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS osif.c 7.111 2024-05-07 15:30:00 "
+#ident "@(#) CSLiS osif.c 7.112 2025-05-28 15:30:00 "
 
 #include <sys/stream.h>
 #include <linux/version.h>
@@ -62,6 +62,12 @@
 #define PCI_DMA_FROMDEVICE	DMA_FROM_DEVICE
 #define PCI_DMA_NONE		DMA_NONE
 #define __iovec_defined 1
+#endif
+
+#if (defined(_S390X_LIS_) || defined(_PPC64_LIS_) )
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309)
+#define _LINUX_PROPERTY_H_  // omit property.h
+#endif
 #endif
 
 #include <linux/pci.h>		/* PCI BIOS functions */

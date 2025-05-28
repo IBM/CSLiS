@@ -35,7 +35,7 @@
  *    dave@gcom.com
  */
 
-#ident "@(#) CSLiS safe.c 7.111 2024-05-07 12:30:00 "
+#ident "@(#) CSLiS safe.c 7.112 2025-05-27 12:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -152,55 +152,54 @@ int  _RP lis_safe_SAMESTR(queue_t *q, char *f, int l)
 }
 
 
-
 int lis_safe_do_putmsg(queue_t *q, mblk_t *mp, ulong qflg, int retry,
 		       char *f, int l)
 {
     lis_flags_t     psw;
-
     int             ta_count;  /* Try Again Count to protect from looping */       
 
     qflg |= QOPENING ;
-    ta_count = 0;
 
 try_again:
-    LIS_QISRLOCK(q, &psw) ;   /* On s390x platform, the Locks needed before test */
-    if (   mp == NULL || q == NULL
-	|| q->q_magic != Q_MAGIC
-	|| q->q_qinfo == NULL
-	|| q->q_qinfo->qi_putp == NULL
+    if (   q == NULL || q->q_qinfo == NULL || q->q_qinfo->qi_putp == NULL
+        || mp == NULL || q->q_magic != Q_MAGIC
        )
     {
-        LIS_QISRUNLOCK(q, &psw) ;
 	LOG(f, l, "NULL q, mp, q_qinfo or qi_putp in putmsg");
 	if (mp != NULL)
            freemsg(mp) ;
 	return(1) ;		/* message consumed */
     }
 
-    if (q->q_flag & (QPROCSOFF | QFROZEN))
-    {
-        ta_count++;  /* count how many times checking queue */
-	if ((q->q_flag & QPROCSOFF) && SAMESTR(q))   /* there is a next queue */
-	{					/* pass to next queue */
-	    LIS_QISRUNLOCK(q, &psw) ;
-            if (ta_count < 1000) { /* if shutting down, but queues are busy, prevent loop */
-	       q = q->q_next ;
-	       goto try_again ;
-            }
-	}
+    LIS_QISRLOCK(q, &psw) ;   /* On s390x platform, the Locks needed before test */
 
-	lis_defer_msg(q, mp, retry, &psw) ;	/* put in deferred msg list */
-	LIS_QISRUNLOCK(q, &psw) ;
-	return(0) ;		/* msg deferred */
-    }
-
-    if ((q->q_flag & qflg) || q->q_defer_head != NULL)
+    if (!(q->q_flag & QCLOSING) ) /* On stopping queue, do not defer */
     {
-	lis_defer_msg(q, mp, retry, &psw) ;
-	LIS_QISRUNLOCK(q, &psw) ;
-	return(0) ;		/* msg deferred */
-    }
+
+       if (q->q_flag & (QPROCSOFF | QFROZEN))
+       {
+          /* ta_count++;  /* count how many times checking queue */
+          if ((q->q_flag & QPROCSOFF) && SAMESTR(q))   /* there is a next queue */  
+          {					     /* pass to next queue if not closing streams */		
+             LIS_QISRUNLOCK(q, &psw) ;
+             q = q->q_next ;
+             goto try_again ;
+          }
+
+          lis_defer_msg(q, mp, retry, &psw) ;	/* put in deferred msg list */
+          LIS_QISRUNLOCK(q, &psw) ;
+          return(0) ;		/* msg deferred */
+       }
+
+       if ((q->q_flag & qflg) || q->q_defer_head != NULL)
+       {
+          lis_defer_msg(q, mp, retry, &psw) ;
+          LIS_QISRUNLOCK(q, &psw) ;
+          return(0) ;		/* msg deferred */
+       }
+
+    }  /* Fall thru here if QCLOSING (stopping queues on shutdown) */
+    
     LIS_QISRUNLOCK(q, &psw) ;
 
     /*
