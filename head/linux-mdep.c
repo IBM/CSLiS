@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.111 2024-12-13 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.112 2025-05-27 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -5559,7 +5559,8 @@ int mount_permission(char * path)
 #else
     struct path nd_path;
 #endif
-#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+#if ((LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)) || \
+    (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309))
     struct mnt_idmap *idmap;
 #elif LINUX_VERSION_CODE > KERNEL_VERSION(5,11,0)
     struct user_namespace *ns_ptr;
@@ -5623,7 +5624,8 @@ int mount_permission(char * path)
 	/* check permission(s) */
 	if (!error)
         {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)
+#if ((LINUX_VERSION_CODE > KERNEL_VERSION(6,0,0)) ||  \
+    (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309))
             idmap = mnt_idmap(nd_path.mnt);
             error = inode_permission(idmap, inode, mask);
 
