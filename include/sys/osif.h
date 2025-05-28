@@ -20,7 +20,7 @@
 #if defined(LINUX) && !defined(OSIF_H)
 #define OSIF_H		/* file included */
 
-#ident "@(#) CSLiS osif.h 7.11 10/20/22 15:30:00 "
+#ident "@(#) CSLiS osif.h 7.112 2025-05-28 15:30:00 "
 #include <sys/LiS/genconf.h>
 #include <linux/version.h>
 #include <linux/version.h>
@@ -43,6 +43,11 @@
 #ifndef PCI_STD_NUM_BARS
 #define PCI_STD_NUM_BARS	6	/* Number of standard BARs */
 #endif
+#endif
+#if (defined(_S390X_LIS_) || defined(_PPC64_LIS_) )
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309)
+#define _LINUX_PROPERTY_H_  // omit property.h
+#endif		
 #endif
 #include <linux/pci.h>
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,1,0)
