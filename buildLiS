@@ -4,6 +4,9 @@
 #
 #  Script to automate building of LiS
 #
+#  Get CSLiS version for reporting.
+CSLIS_VER="CSLiS version = $(grep lis_version /usr/src/CSLiS-711/head/version.c | awk '{ print $4 }' | sed 's/"//g')"
+#
 # First check the current directory is /usr/src/LiS-2.19/ or /usr/src/LiS
 # If not, write error that not in proper path and exit:
 #
@@ -17,6 +20,7 @@ else
    then
       echo " Error: ./buildLiS not run from /usr/src/LiS-2.19 directory. "
       echo " The buildLiS script requires home directory be $LISHOME or $LISHOME2. "
+      echo "$CSLIS_VER"
       exit 9
    fi
 fi 
@@ -60,6 +64,7 @@ then
         echo "CONFIG_OPTS is: $CONFIG_OPTS"
 else
     echo " No slot available for LiS BASE MAJOR device entry, abort build"
+    echo "$CSLIS_VER"
     exit 6
 fi
 #
@@ -69,6 +74,7 @@ fi
   if [ $? != 0 ]
   then
      echo "Error in make, buildLiS script aborting"
+     echo "$CSLIS_VER"
      exit 1
   fi
 #
@@ -78,6 +84,7 @@ fi
   if [ $? != 0 ]
   then
      echo "Error in make install, buildLiS script aborting"
+     echo "$CSLIS_VER"
      exit 2
   fi
 #
@@ -98,6 +105,7 @@ then
   if [ $? != 0 ]
   then
      echo "Error in ../km26 make setup, buildLiS script aborting"
+     echo "$CSLIS_VER"
      exit 3
   fi
 #
@@ -109,12 +117,14 @@ then
     if [ $? != 0 ]
   then
      echo "Error in ../km26 make modules, buildLiS script aborting"
+     echo "$CSLIS_VER"
      exit 4
   fi
   make install
   if [ $? != 0 ]
   then
      echo "Error in ../km26 make install, buildLiS script aborting"
+     echo "$CSLIS_VER"
      exit 5
   fi
 #
