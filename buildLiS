@@ -130,5 +130,5 @@ then
 #
 fi
 #
-echo "BuildLiS done, no errors reported"
+echo "BuildLiS $CSLIS_VER done, no errors reported"
 
