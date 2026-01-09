@@ -31,7 +31,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS lispci.c 7.111 2024-05-07 15:30:00 "
+#ident "@(#) CSLiS lispci.c 7.113 2025-12-11 15:30:00 "
 
 #include <sys/stream.h>		/* gets all the right LiS stuff included */
 #include <sys/lispci.h>		/* LiS PCI header file */
@@ -40,6 +40,15 @@
 # ifdef RH_71_KLUDGE			/* boogered up incls in 2.4.2 */
 #  undef CONFIG_HIGHMEM			/* b_page has semi-circular reference */
 # endif
+
+#if (defined(_S390X_LIS_) || defined(_PPC64_LIS_) )
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309) || \
+     (LINUX_VERSION_CODE > KERNEL_VERSION(6,10,0))) /* RHEL 9.6 or RHEL 10, SLES 16 */
+#define _LINUX_PROPERTY_H_  // omit property.h
+#endif
+
+#endif
+
 #include <linux/pci.h>		/* kernel PCI header file */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
@@ -50,7 +59,6 @@
 #define PCI_DMA_FROMDEVICE      DMA_FROM_DEVICE
 #define PCI_DMA_NONE            DMA_NONE
 #endif
-
 
 
 static lis_pci_dev_t	*lis_pci_dev_list = NULL ;
@@ -249,7 +257,6 @@ lis_pci_dev_t   * _RP lis_pci_find_slot(unsigned bus, unsigned dev_fcn)
 } /* lis_pci_find_slot */
 
 #endif  /* end kernel 6.0.0 check */
-
 
 /************************************************************************
 *                        lis_pci_read_config_byte                       *
