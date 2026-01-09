@@ -40,7 +40,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) CSLiS linux-mdep.h 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.h 7.11 2025-11-17 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -468,7 +468,11 @@ struct inode  *lis_set_up_inode(struct file *f, struct inode *inode) ;
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,24)
    #define F_COUNT(f)	( (f) ? atomic_read(&((f)->f_count)) : -1 )
 #else
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,12,0)
    #define F_COUNT(f)   ( (f) ? atomic_long_read(&((f)->f_count)) : -1 )
+#else
+   #define F_COUNT(f)   ( (f) ? file_count(f) : -1 )
+#endif
 #endif
 
 struct dentry *lis_d_alloc_root(struct inode *i, int m);

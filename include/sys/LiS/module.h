@@ -28,7 +28,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS module.h 7.11 2022-10-26 15:30:00 "
+#ident "@(#) CSLiS module.h 7.11 2025-11-20 15:30:00 "
 
 #if defined(LINUX) && defined(__KERNEL__)
 
@@ -51,7 +51,13 @@
 #    endif
 #    include <linux/module.h>
 #if LINUX_VERSION_CODE > KERNEL_VERSION(5,3,0)
+/* Check for a RHEL 10 by any RHEL RELEASE > "9.f" */
+/* This change has not been seen in SLES 16 6.12.0 kernel, yet */
+#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2320)
+MODULE_IMPORT_NS("STREAMS");
+#else
 MODULE_IMPORT_NS(STREAMS);
+#endif
 #endif
 #  else
 #    error This can only be a module in the Linux kernel environment
