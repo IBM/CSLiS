@@ -31,7 +31,7 @@
 *									*
 ************************************************************************/
 
-#ident "@(#) CSLiS osif.c 7.112 2025-05-28 15:30:00 "
+#ident "@(#) CSLiS osif.c 7.113 2025-12-11 15:30:00 "
 
 #include <sys/stream.h>
 #include <linux/version.h>
@@ -65,7 +65,8 @@
 #endif
 
 #if (defined(_S390X_LIS_) || defined(_PPC64_LIS_) )
-#if (defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309)
+#if ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE > 2309) || \
+     (LINUX_VERSION_CODE > KERNEL_VERSION(6,10,0))) /* RHEL 9.6 or RHEL 10, SLES 16 */
 #define _LINUX_PROPERTY_H_  // omit property.h
 #endif
 #endif

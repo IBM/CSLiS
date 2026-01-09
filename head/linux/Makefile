@@ -36,7 +36,11 @@ endif
 # Are we compiling LiS as a loadable kernel module?
 ifeq ($(CONFIG_STREAMS),m)
   OPT += -DMODULE
-  OPT += -DDEFAULT_SYMBOL_NAMESPACE=STREAMS
+  ifeq ($(QUOTEDNAMESPACE),y)
+     OPT += -DDEFAULT_SYMBOL_NAMESPACE=\"STREAMS\"
+  else 
+     OPT += -DDEFAULT_SYMBOL_NAMESPACE=STREAMS
+  endif
   ifeq ($(KBUILD_NEEDS_MODNAME),y)
     OPT += -DKBUILD_MODNAME=\"streams\"
   endif
