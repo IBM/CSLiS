@@ -113,6 +113,7 @@ then
 # On Debian type, modules are made using M=
 #
   export `grep MAKEDIRTYPE /usr/src/LiS/config.in`
+  export `grep QUOTEDNAMESPACE /usr/src/LiS/config.in`
   make -C $KBIN $MAKEDIRTYPE=/usr/src/LiS/km26  modules LINUX_TYPE=$LINUX_TYPE
     if [ $? != 0 ]
   then
