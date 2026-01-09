@@ -34,11 +34,11 @@
  * 
  */
 
-#ident "@(#) CSLiS version.c 7.112 2025-05-27 12:30:00 "
+#ident "@(#) CSLiS version.c 7.113 2025-12-11 12:30:00 "
 
 
-char	lis_version[] = "CS71122" ;
-char	lis_date[]    = "28 May 25" ;
+char	lis_version[] = "CS71130" ;
+char	lis_date[]    = "11 Dec 25" ;
 
 #if 0
 

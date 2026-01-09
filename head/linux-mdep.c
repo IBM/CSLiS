@@ -3,7 +3,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: Jeff L Smith
- * RCS Id          : $Id: linux-mdep.c,v 7.11 2024/12/13 15:30:00 steve Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 7.11 2025/06/11 15:30:00 7113 $
  * Purpose         : provide Linux kernel <-> CSLiS entry points.
  * ----------------______________________________________________
  *
@@ -45,7 +45,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) CSLiS linux-mdep.c 7.112 2025-05-27 15:30:00 "
+#ident "@(#) CSLiS linux-mdep.c 7.113 2025-06-11 15:30:00 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -1740,9 +1740,17 @@ int lis_fs_kern_mount_sb( struct super_block *sb, void *ptr, int silent )
     ktime_get_coarse_real_ts64(&isb->i_mtime);
     ktime_get_coarse_real_ts64(&isb->i_ctime);
 #else
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,7,0)    
     ktime_get_coarse_real_ts64(&isb->__i_atime);
     ktime_get_coarse_real_ts64(&isb->__i_mtime);
-    ktime_get_coarse_real_ts64(&isb->__i_ctime);    
+    ktime_get_coarse_real_ts64(&isb->__i_ctime);
+#else
+    struct timespec64       i_ttime;
+    ktime_get_coarse_real_ts64(&i_ttime);
+    inode_set_atime_to_ts(isb, i_ttime);
+    inode_set_mtime_to_ts(isb, i_ttime);
+    inode_set_ctime_to_ts(isb, i_ttime);
+#endif    
 #endif
 #endif    
     isb->i_op    = &lis_streams_iops;
@@ -2414,9 +2422,17 @@ lis_new_inode( struct file *f, dev_t dev )
         ktime_get_coarse_real_ts64(&new->i_mtime);
         ktime_get_coarse_real_ts64(&new->i_ctime);
 #else
-        ktime_get_coarse_real_ts64(&new->__i_atime);
-        ktime_get_coarse_real_ts64(&new->__i_mtime);
-        ktime_get_coarse_real_ts64(&new->__i_ctime);	
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,7,0)
+    ktime_get_coarse_real_ts64(&new->__i_atime);
+    ktime_get_coarse_real_ts64(&new->__i_mtime);
+    ktime_get_coarse_real_ts64(&new->__i_ctime);
+#else
+    struct timespec64       i_ttime;
+    ktime_get_coarse_real_ts64(&i_ttime);
+    inode_set_atime_to_ts(new, i_ttime);
+    inode_set_mtime_to_ts(new, i_ttime);
+    inode_set_ctime_to_ts(new, i_ttime);
+#endif
 #endif	
 #endif
 	
@@ -2734,9 +2750,17 @@ struct inode *lis_set_up_inode(struct file *f, struct inode *inode)
     ktime_get_coarse_real_ts64(&new->i_mtime);
     ktime_get_coarse_real_ts64(&new->i_ctime);
 #else
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6,7,0)
     ktime_get_coarse_real_ts64(&new->__i_atime);
     ktime_get_coarse_real_ts64(&new->__i_mtime);
-    ktime_get_coarse_real_ts64(&new->__i_ctime);    
+    ktime_get_coarse_real_ts64(&new->__i_ctime;
+#else
+    struct timespec64       i_ttime;
+    ktime_get_coarse_real_ts64(&i_ttime);
+    inode_set_atime_to_ts(new, i_ttime);
+    inode_set_mtime_to_ts(new, i_ttime);
+    inode_set_ctime_to_ts(new, i_ttime);
+#endif
 #endif
 #endif    
 
@@ -3130,7 +3154,9 @@ int lis_fifo_open_sync( struct inode *i, struct file *f )
 	if(!lis_fifo_info_new(i))
 	    goto err_nocleanup;
     }
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,12,0)    
     f->f_version = 0;
+#endif    
 
     switch (f->f_mode & (FMODE_READ|FMODE_WRITE)) {
     case FMODE_READ:
@@ -3146,7 +3172,9 @@ int lis_fifo_open_sync( struct inode *i, struct file *f )
 	if (!PIPE_WRITERS(*i)) {
 	    if ((f->f_flags & O_NONBLOCK)) {
 		/* suppress POLLHUP until we have seen a writer */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,12,0)		    
 		f->f_version = PIPE_WCOUNTER(*i);
+#endif		
 	    } else 
 	    {
 		lis_fifo_wait_for_partner(i, &PIPE_WCOUNTER(*i));
@@ -4791,9 +4819,10 @@ void cleanup_module( void )
     memset ((void *)&lis_tmpmapping,0,sizeof(struct address_space));
 
     lis_mnt->mnt_sb->s_bdev = &lis_tmpbd;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,12,0)    
     lis_mnt->mnt_sb->s_bdev->bd_inode = &lis_tmpinode;
     lis_mnt->mnt_sb->s_bdev->bd_inode->i_mapping = &lis_tmpmapping;
-
+#endif
    /*                                                                *
     *  If Kernel GT 6, OR RHEL is 9.4 AND zLinux, OR RHEL is 9.5 and * 
     *      PSeries or Intel                                          */
