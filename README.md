@@ -27,17 +27,15 @@ libraries and utility programs will be in the proper places on your system.
 
 KERNEL COMPATIBILITY
 
-This version of CSLiS will install in any kernel version from 3.x
+This version of CSLiS will install in any kernel version from 4.x
 onward (through 6.x).
 
 The LiS software resides outside the kernel source tree.  It runs
 as a loadable module.
 
-Latest update superseeds the December 05, 2024 fix. On December 13, 2024, Issue #26 was 
-addressed and fixed. It fixes a problem in compile on RHEL 9.5 (5.14.0 leve) for ppc64le and x86_64 platforms where
-"invalidate_device()" call was changed to "invalidate_bdev()" (a Linux 6 kernel change). 
-Fix was made and the updates applied December 13, 2024. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
-and check date is at least 13 Dec 2024. The version will show a "CS7111B" for this new fix.
+Latest update superseeds the January 09, 2026. Latest release supports RHEL 10 and SLES 16
+kernels. Updates applied in December 2025. Check date by "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
+and check date is at least 11 Dec 2025. The version will show a "CS71130" for this new update.
 
 Jeff L Smith
 <jefsmith@us.ibm.com>
