@@ -2,11 +2,14 @@
 # Copyright 2022 - IBM Inc. All rights reserved
 # SPDX-License-Identifier: LGPL-2.1
 #
-KBUILD_CPPFLAGS += -DKM26 -DLIS_OBJNAME -DLiS -D__KERNEL__ -DVERSION_2 -Wall -Wstrict-prototypes  -D__KERNGLUE__ -DINLINE=inline -DSTATIC=static -D__SMP__ -DxLISMODVERS -I/usr/src/LiS/include -I/usr/include -DRCVOID -DUSE_KMEM_CACHE -DUSE_KMEM_TIMER -DLINUX -DUSE_KTHREAD -DMODULE -DDEFAULT_SYMBOL_NAMESPACE=STREAMS
-
-
+KBUILD_CPPFLAGS += -DKM26 -DLIS_OBJNAME -DLiS -D__KERNEL__ -DVERSION_2 -Wall -Wstrict-prototypes  -D__KERNGLUE__ -DINLINE=inline -DSTATIC=static -D__SMP__ -DxLISMODVERS -I/usr/src/LiS/include -I/usr/include -DRCVOID -DUSE_KMEM_CACHE -DUSE_KMEM_TIMER -DLINUX -DUSE_KTHREAD -DMODULE
+# Test for SLES 16 or later needed quotes on NAMESPACE
+ifeq ($(QUOTEDNAMESPACE),y)
+     KBUILD_CPPFLAGS += -DDEFAULT_SYMBOL_NAMESPACE=\"STREAMS\"
+else
+     KBUILD_CPPFLAGS += -DDEFAULT_SYMBOL_NAMESPACE=STREAMS
+endif
 CPPFLAGS += -DKM26 -DLIS_OBJNAME -DLiS -D__KERNEL__ -DVERSION_2 -Wall -Wstrict-prototypes  -D__KERNGLUE__ -DINLINE=inline -DSTATIC=static -D__SMP__ -DxLISMODVERS -I/usr/src/LiS/include -I/usr/include -DRCVOID -DUSE_KMEM_CACHE -DUSE_KMEM_TIMER -DLINUX -DUSE_KTHREAD -DMODULE
-
 UNAME := $(shell uname -r)
 ARCH := $(shell uname -m)
 ifeq ($(ARCH),x86_64)
