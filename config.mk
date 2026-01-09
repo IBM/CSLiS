@@ -159,11 +159,15 @@ XOPTS+= -D"KBUILD_BASENAME=KBUILD_STR(streams)"
 
 #
 # Compiler options for debugging and optimization.
-#
+
 ifeq ($(DBG_OPT),y)
 XOPTS += -ggdb -O $(CC_OPT2)
 else
-XOPTS += $(CC_OPTIMIZE) $(CC_OPT2) -DINLINE=inline -DSTATIC=static -fomit-frame-pointer
+XOPTS += $(CC_OPTIMIZE) $(CC_OPT2) -DINLINE=inline -DSTATIC=static -std=gnu11 -fomit-frame-pointer
+endif
+# Add fcf_protection if the double quoted namespace is required
+ifeq ($(FCF_PROTECTION),y)
+   XOPTS += -fcf-protection=branch
 endif
 
 #

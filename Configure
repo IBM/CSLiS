@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: LGPL-2.1
 #
 
-Configure_version="7.1111 11/14/24"
+Configure_version="7.113 11/17/25"
 
 if [ -f /proc/kallsyms ]; then
     KSYMS=/proc/kallsyms
@@ -409,9 +409,8 @@ default_ksrc()
 
     # change symbolic links to the real directories
     if [ -L $KBIN ]; then
-	KBIN=`ls -l $KBIN | sed -e 's/^.*-> //' -e 's/\.\.\//\//g'`
+       KBIN=`ls -l $KBIN | sed -e 's/^.*-> //' -e 's/\.\.\/\.\.\/\.\.\//\/usr\//g'`
     fi
-
     if [ -L $KSRC ]; then
 	KSRC=`ls -l $KSRC | sed -e 's/^.*-> //' -e 's/\.\.\//\//g'`
         if [ ! -d "$KSRC" -a ! -L "$KSRC" ]; then
@@ -1885,7 +1884,7 @@ Do you want to do that now?"
        KBUILD_NEEDS_MODNAME=y
     elif [ "$KVER_MAJOR" = "3" ]; then  # for any > 3.0 
        KBUILD_NEEDS_MODNAME=y
-       KBUILD_NEEDS_SYMVERS=Y
+       KBUILD_NEEDS_SYMVERS=y
     elif [ $KVER_MAJOR -ge 4 ]; then  # for any > 4 
        KBUILD_NEEDS_MODNAME=y
        KBUILD_NEEDS_SYMVERS=y
@@ -2352,15 +2351,29 @@ elif [ "$MACHINE" = "s390x" ]; then
           NO32OVER64BUILD=y
        fi
    fi   
-
 # For SLES 15 SP2 SPLITUSERKERNEL and NO32OVER64BUILD is set
 elif [ $KVER_MAJOR -ge 5 ]; then
    SPLITUSERKERNEL=y
    RHEL89=`grep "Red Hat Enterprise Linux " /etc/os-release 2>/dev/null | wc -l`
    if [ $RHEL89 -eq 0 ]; then
       NO32OVER64BUILD=y
+   elif [ $KVER_MAJOR -ge 6 ]; then
+      NO32OVER64BUILD=y	   
    fi
 fi
+# For  6,12 levels and SLES, use double quoted name spaces
+QUOTEDNAMESPACE=n
+# For 6,12 and Intel platform, set fcf_protection
+FCF_PROTECTION=n
+if [ $KVER_MAJOR -ge 6 ]; then
+   if [ $KVER_MINOR -ge 12 ]; then
+      QUOTEDNAMESPACE=y
+      if [ "$MACHINE" = "x86_64" ]; then 
+	   FCF_PROTECTION=y
+      fi
+   fi
+fi   
+
 # the following checks for post-2.4 kernels by version, but also
 # sets some other related variables
 #
@@ -2513,6 +2526,8 @@ cfg_out CCREGPARM "$CCREGPARM"
 cfg_out STREAMS_REGPARM "$STREAMS_REGPARM"
 cfg_out LIS_OLD_CONSTS $LIS_OLD_CONSTS
 cfg_out SOLARIS_STYLE_CMN_ERR $SOLARIS_STYLE_CMN_ERR
+cfg_out QUOTEDNAMESPACE $QUOTEDNAMESPACE
+cfg_out FCF_PROTECTION $FCF_PROTECTION
 cfg_out DBG_OPT $DBG_OPT
 cfg_out LIS_SHLIB $LIS_SHLIB
 cfg_out package ${package}
