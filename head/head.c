@@ -62,7 +62,7 @@
  *
  */
 
-#ident "@(#) CSLiS head.c 7.11 2024-12-02 15:30:00 "
+#ident "@(#) CSLiS head.c 7.11 2026-05-21 15:30:00 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -3599,8 +3599,17 @@ lis_do_tmout( unsigned long arg )
 #else   /* Linux 14.5 changed timer_list and now pass arg in new struct */
 lis_do_tmout(struct timer_list *tmout_tl)
 {
+/* #if RHEL 9.8,RHEL_RELEASE_CODE >= 2312, or RHEL 10,RHEL_RELEASE_CODE >= 2562 */    
+#if ((LINUX_VERSION_CODE == KERNEL_VERSION(5,14,0) && (defined(RHEL_RELEASE_CODE) && \
+       RHEL_RELEASE_CODE >= 2312)) || \
+     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2562)  || \
+      (LINUX_VERSION_CODE > KERNEL_VERSION(6,12,0))))
+
+    struct lis_timer_list *lis_tl = timer_container_of(lis_tl,tmout_tl,tl);
+#else
     struct lis_timer_list *lis_tl = from_timer(lis_tl,tmout_tl,tl);
-  
+#endif
+
     stdata_t *hd = (stdata_t*) lis_tl->arg;
 #endif
 
@@ -3624,8 +3633,17 @@ lis_do_rd_tmout( unsigned long arg )
 
 #else   /* Linux 14.5 changed timer_list and now pass arg in new struct */
 lis_do_rd_tmout(struct timer_list *tmout_tl)
-{      
+{  
+/* #if RHEL 9.8,RHEL_RELEASE_CODE >= 2312, or RHEL 10,RHEL_RELEASE_CODE >= 2562 */         
+#if ((LINUX_VERSION_CODE == KERNEL_VERSION(5,14,0) && (defined(RHEL_RELEASE_CODE) && \
+       RHEL_RELEASE_CODE >= 2312)) || \
+     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2562)  || \
+      (LINUX_VERSION_CODE > KERNEL_VERSION(6,12,0))))
+
+    struct lis_timer_list *lis_tl = timer_container_of(lis_tl,tmout_tl,tl);
+#else
     struct lis_timer_list *lis_tl = from_timer(lis_tl,tmout_tl,tl);
+#endif    
   
     stdata_t *hd = (stdata_t*) lis_tl->arg;
 #endif

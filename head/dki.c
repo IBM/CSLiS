@@ -32,7 +32,7 @@
  * 
  */
 
-#ident "@(#) CSLiS dki.c 7.111 2024-05-07 15:30:00 "
+#ident "@(#) CSLiS dki.c 7.11 2026-05-21 15:30:00 "
 
 #include <sys/stream.h>
 #ifdef LIS_OBJNAME  /* This must be defined before including module.h on Linux 6.8 */
@@ -171,7 +171,15 @@ static void sys_timeout_fcn(ulong arg)
 #else
 static void sys_timeout_fcn(struct timer_list *tmout_tl)
 {
+#if ((LINUX_VERSION_CODE == KERNEL_VERSION(5,14,0) && (defined(RHEL_RELEASE_CODE) && \
+       RHEL_RELEASE_CODE >= 2312)) || \
+     ((defined(RHEL_RELEASE_CODE) && RHEL_RELEASE_CODE >= 2562)  || \
+      (LINUX_VERSION_CODE > KERNEL_VERSION(6,12,0))))
+
+    struct lis_timer_list *lis_tl = timer_container_of(lis_tl,tmout_tl,tl);
+#else
     struct lis_timer_list *lis_tl = from_timer(lis_tl,tmout_tl,tl);
+#endif
     tlist_t             *tp = (tlist_t *) lis_tl->arg ;
 #endif
 
