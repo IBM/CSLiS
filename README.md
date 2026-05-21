@@ -36,7 +36,7 @@ as a loadable module.
 Latest update superseeds the January 09, 2026. Latest release supports RHEL 10.2, RHEL 9.8 with update
 to handle changes macro calls in Linux kernel. Updates applied in May, 2026. Check date by 
 "grep -1 lis_date /usr/src/CSLiS-711/head/version.c"
-and check date is at least 11 Dec 2025. The version will show a "CS71130" for this new update.
+and check date is at least 21 May 2026. The version will show a "CS71130" for this new update.
 
 Jeff L Smith
 <jefsmith@us.ibm.com>
