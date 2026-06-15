@@ -313,7 +313,7 @@ nak_it:		mp->b_datap->db_type = M_IOCNAK;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,10,0)
 		if (iocp->ioc_uid != 0) {
 #else
-                if (uid_valid(iocp->ioc_uid)) {
+                if (__kuid_val(iocp->ioc_uid) != 0) {
 #endif
 			err = -EACCES;
 			goto nak_it;
