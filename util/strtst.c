@@ -4921,7 +4921,7 @@ void sad_test(void)
 		xit();
 	}
 	if (list.sl_nmods != 3) {
-		print("sad_test: loop driver open autopushed %d modules.\n");
+		print("sad_test: loop driver open autopushed %d modules.\n", list.sl_nmods);
 		print("sad_test: Expected 2 autopushed modules.\n");
 		xit();
 	}
